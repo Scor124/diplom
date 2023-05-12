@@ -456,7 +456,11 @@ return new class extends Migration
         DB::unprepared("DROP PROCEDURE IF EXISTS sp_alterdiagram");
 
         Schema::dropIfExists('users');
-
+        Schema::dropIfExists('teachers');
+        Schema::dropIfExists('classes');
+        Schema::dropIfExists('students');
+        Schema::dropIfExists('casses');
+        Schema::dropIfExists('subjects');
         Schema::dropIfExists('personal_access_tokens');
     }
 };
