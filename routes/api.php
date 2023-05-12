@@ -18,8 +18,10 @@ Route::get('/data', function () {
 
 });
 Route::middleware(['auth','api'])->group(function (){
-    Route::get('/students',[\App\Http\Controllers\APIDataController::class,'']);
+    Route::get('/students',[\App\Http\Controllers\APIDataController::class,'getStudent']);
     Route::get('/student/{id}',[\App\Http\Controllers\APIDataController::class,'']);
+    Route::post('/student',[\App\Http\Controllers\APIDataController::class,'']);
+    Route::delete('/student',[\App\Http\Controllers\APIDataController::class,'']);
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

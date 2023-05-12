@@ -48,8 +48,8 @@ return new class extends Migration
 
         Schema::create('students',function (Blueprint $table){
             $table->increments('id');
-            $table->integer('UserID');
-            $table->integer('ClassID');
+            $table->integer('user_id');
+            $table->integer('class_id');
         });
 
         Schema::create('classes', function (Blueprint $table) {
