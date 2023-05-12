@@ -18,10 +18,18 @@ Route::get('/data', function () {
 
 });
 Route::middleware(['auth','api'])->group(function (){
-    Route::get('/students',[\App\Http\Controllers\APIDataController::class,'getStudent']);
-    Route::get('/student/{id}',[\App\Http\Controllers\APIDataController::class,'']);
-    Route::post('/student',[\App\Http\Controllers\APIDataController::class,'']);
-    Route::delete('/student',[\App\Http\Controllers\APIDataController::class,'']);
+    Route::get('/students',[\App\Http\Controllers\APIDataController::class,'getStudents']);
+    Route::get('/student/{id}',[\App\Http\Controllers\APIDataController::class,'getStudent']);
+    Route::post('/student/update',[\App\Http\Controllers\APIDataController::class,'updateStudent']);
+    Route::post('/student/create',[\App\Http\Controllers\APIDataController::class,'createStudent']);
+    Route::delete('/student/delete',[\App\Http\Controllers\APIDataController::class,'deleteStudent']);
+
+    Route::get('/students',[\App\Http\Controllers\APIDataController::class,'getStudents']);
+    Route::get('/student/{id}',[\App\Http\Controllers\APIDataController::class,'getStudent']);
+    Route::post('/student/update',[\App\Http\Controllers\APIDataController::class,'updateStudent']);
+    Route::post('/student/create',[\App\Http\Controllers\APIDataController::class,'createStudent']);
+    Route::delete('/student/delete',[\App\Http\Controllers\APIDataController::class,'deleteStudent']);
+
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
