@@ -14,8 +14,6 @@ return new class extends Migration
      */
     public function up()
     {
-
-
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
@@ -25,7 +23,7 @@ return new class extends Migration
             $table->boolean('is_verified')->nullable()->default('false');
             $table->boolean('is_teacher')->nullable()->default('false');
             $table->rememberToken();
-            $table->timestamps();
+            $table->timestamps(1);
         });
 
         Schema::create('teachers', function (Blueprint $table) {

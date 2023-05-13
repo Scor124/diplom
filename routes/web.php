@@ -5,6 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+Auth::routes();
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -27,6 +28,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/marks',function (){
             return Inertia::render('MarksPage');
         })->name('marks');
+        Route::get('/classes',function (){
+            return DB::table('classes')->get();
+        })->name('classes');
     //});
 
     Route::middleware(['is-admin'])->group(function (){
