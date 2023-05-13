@@ -41,6 +41,8 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'created_at' => date('d-m-Y H:i:s'),
+            'updated_at' => date('d-m-Y H:i:s'),
         ]);
 
         event(new Registered($user));

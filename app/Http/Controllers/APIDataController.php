@@ -10,16 +10,6 @@ use http\Client\Request;
 
 class APIDataController extends Controller
 {
-    public function data()
-    {
-
-        $users = \App\Models\User::all();
-        return response()->json([
-            'users' => $users,
-            'students' => $students,
-            'classes' => $classes
-        ]);
-    }
     public function createUser(Request $request)
     {
         $user = User::create($request->all());
@@ -64,6 +54,10 @@ class APIDataController extends Controller
         return response()->json($user);
     }
 
+    public function getUsers()
+    {
+        return response(User::all());
+    }
     public function createStudent(Request $request)
     {
         $student = $request->all();

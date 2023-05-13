@@ -5,7 +5,7 @@ import {onActivated} from "vue";
 </script>
 
 <template>
-    <Head title="Dashboard" />
+    <Head title="Активности" />
 
     <AuthenticatedLayout>
         <template #header>
