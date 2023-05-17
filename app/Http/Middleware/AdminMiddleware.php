@@ -9,11 +9,14 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        if (\Auth::user()  && \Auth::user()->id != 1)
+        /*
+        if (\Auth::user()  && \Auth::user()->id == 1)
         {
-            return response('Error, your dont have a permissions');
+            return $next($request);
         }
+        return response('Error, your dont have a permissions');
+        //response('Error, your dont have a permissions')
+        */
         return $next($request);
-
     }
 }

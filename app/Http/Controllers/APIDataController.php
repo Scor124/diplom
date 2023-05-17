@@ -10,6 +10,7 @@ use http\Client\Request;
 
 class APIDataController extends Controller
 {
+
     public function createUser(Request $request)
     {
         $user = User::create($request->all());
@@ -62,7 +63,7 @@ class APIDataController extends Controller
     {
         $student = $request->all();
 
-        if (Student::where('user_id', $student['user_id'])->exists()) {
+        if (Student::where('UserID', $student['UserID'])->exists()) {
             return response()->json(['message' => 'User already exists in students table'], 409);
         }
 
@@ -226,7 +227,8 @@ class APIDataController extends Controller
     }
     public function getClasses()
     {
-        return response()->json(Classes::all());
+        return response(Classes::all());
+        //return response()->json(Classes::all());
     }
     public function getClass($id)
     {
