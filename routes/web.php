@@ -1,6 +1,9 @@
 <?php
 
+namespace App\Http\Controllers\Auth;
+
 use App\Http\Controllers\ProfileController;
+use Auth;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -30,7 +33,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/marks',function (){
             return Inertia::render('MarksPage');
         })->name('marks');
-
+        Route::get('/classes',function (){
+            return DB::table('classes')->get();
+        })->name('classes');
     //});
 
     //Route::middleware(['is-admin'])->group(function (){

@@ -6,8 +6,8 @@ use App\Models\Classes;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
-use http\Client\Request;
-
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 class APIDataController extends Controller
 {
 
@@ -19,16 +19,21 @@ class APIDataController extends Controller
 
     public function updateUser(Request $request, $id)
     {
+
         $user = User::find($id);
 
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
-
-        $user->fill($request->all());
+        $user->is_verified = $request->input('is_verified');
+        $user->is_teacher = $request->input('is_teacher');
+        //$user->fill($request->all());
         $user->save();
 
-        return response()->json($user);
+        return response()->json([
+            'message' => 'User update successfully',
+            'data' => $user
+        ]);
     }
 
     public function deleteUser($id)
@@ -82,7 +87,7 @@ class APIDataController extends Controller
 
         $student->fill($request->all());
 
-        if (Student::where('user_id', $student['user_id'])->where('id', '!=', $id)->exists()) {
+        if (Student::where('UserId', $student['UserId'])->where('id', '!=', $id)->exists()) {
             return response()->json(['message' => 'User already exists in students table'], 409);
         }
 
@@ -122,8 +127,8 @@ class APIDataController extends Controller
     {
         $teacher = $request->all();
 
-        if (Teacher::where('user_id', $teacher['user_id'])->exists()
-            || Student::where('user_id', $teacher['user_id'])->exists()) {
+        if (Teacher::where('UserId', $teacher['user_id'])->exists()
+            || Student::where('UserId', $teacher['UserId'])->exists()) {
             return response()->json(['message' =>
                 'User already exists in teachers or students table'], 409);
         }
@@ -143,8 +148,8 @@ class APIDataController extends Controller
 
         $teacher->fill($request->all());
 
-        if (Teacher::where('user_id', $teacher['user_id'])->where('id', '!=', $id)->exists()
-            || Student::where('user_id', $teacher['user_id'])->exists()) {
+        if (Teacher::where('UserId', $teacher['UserId'])->where('id', '!=', $id)->exists()
+            || Student::where('UserId', $teacher['UserId'])->exists()) {
             return response()->json(['message' => 'User already exists in teachers or students table'], 409);
         }
 

@@ -9,6 +9,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * @method static where(string $string, mixed $UserID)
+ * @method static create($student)
+ */
 class Student extends Model
 {
     use HasApiTokens, Notifiable;
