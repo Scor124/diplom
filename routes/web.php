@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\ProfileController;
 use Auth;
+use DB;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -45,6 +46,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/users',function (){
             return Inertia::render('Admin/UsersPage');
         })->name('admin.users');
+        Route::get('/admin/users/add',function (){
+            return Inertia::render('Admin/UserAddPage');
+        })->name('admin.users.add');
         Route::get('/admin/classes',function (){
             return Inertia::render('Admin/ClassesPage');
         })->name('admin.classes');

@@ -22,15 +22,15 @@ defineProps({
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                     <div>
-                        <div v-if="isVerified" class="container text-center">
-                            <div class="row">
-                                <Link class="col" :href="route('admin.users')" :ref="route('admin.users')">
+                        <div v-if="isVerified" class="container-fluid text-center">
+                            <div class="row justify-content-center mx-auto">
+                                <Link class="col-4 btn btn-primary" :href="route('admin.users')" :ref="route('admin.users')">
                                     Пользователи
                                 </Link>
-                                <Link class="col" :href="route('admin.classes')" :ref="route('admin.classes')">
+                                <Link class="col-4 btn btn-link" :href="route('admin.classes')" :ref="route('admin.classes')">
                                     Группы
                                 </Link>
-                                <Link class="col" :href="route('admin.students')" :ref="route('admin.students')">
+                                <Link class="col-4 btn btn-link" :href="route('admin.students')" :ref="route('admin.students')">
                                     Студенты
                                 </Link>
                             </div>

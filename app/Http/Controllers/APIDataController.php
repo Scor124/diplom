@@ -8,11 +8,20 @@ use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Inertia\Testing\Concerns\Has;
+
 class APIDataController extends Controller
 {
 
     public function createUser(Request $request)
     {
+        /*
+        $user = new User([
+            'name' => $request->only('name'),
+
+        ]);
+        $request->all('password') = \Hash::make($request->only('password'));
+        */
         $user = User::create($request->all());
         return response()->json($user, 201);
     }

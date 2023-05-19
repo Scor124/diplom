@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import {Head} from "@inertiajs/vue3";
+import {Head, Link} from "@inertiajs/vue3";
 import axios from "axios";
 </script>
 <script>
@@ -47,31 +47,37 @@ export default {
 <template>
     <Head title="Управление пользователями"></Head>
     <AuthenticatedLayout>
-        <div class="form-group mx-sm-3 mb-2 bg-dark border border-dark rounded">
-            <input type="text" placeholder="Поиск по Ф.И.О. и e-mail" v-model="searchQuery">
-        </div>
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <table>
-                    <thead>
-                    <tr>
-                        <th class="col-auto">Ф.И.О.</th>
-                        <th class="col-auto">E-mail</th>
-                        <th class="col-auto">Пароль</th>
-                        <th class="col-auto">Подтвержден</th>
-                        <th class="col-auto">Учитель</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="user in filteredUsers" :key="user.id">
+
+        <div class="py-12 ">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8" >
+                <div class="flex-wrap justify-content-center rounded-5">
+                    <input class="rounded-pill w-auto" type="text" placeholder="Поиск по Ф.И.О. и e-mail" v-model="searchQuery">
+                </div>
+                <div class="col-auto">
+                    <table class="table-auto scroll-m-0.5 overscroll-y-auto">
+                        <thead>
+                        <tr >
+                            <th>Ф.И.О.</th>
+                            <th>E-mail</th>
+                            <th>Подтвержден</th>
+                            <th>Учитель</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="user in filteredUsers" :key="user.id" class="row-auto">
                             <td>{{ user.name }}</td>
                             <td>{{ user.email }}</td>
-                            <td>{{ user.password }}</td>
-                            <td><input type="checkbox" v-model="user.is_verified" @change="updateUser(user)"></td>
-                            <td><input type="checkbox" v-model="user.is_teacher" @change="updateUser(user)"></td>
+                            <td><input class="justify-center" type="checkbox" v-model="user.is_verified" @change="updateUser(user)"></td>
+                            <td><input class="items-center" type="checkbox" v-model="user.is_teacher" @change="updateUser(user)"></td>
                         </tr>
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
+
+
+                <Link :href="route('admin.users.add')" :ref="route('admin.users.add')" class="btn btn-outline-secondary">
+                    Добавить пользователя
+                </Link>
             </div>
         </div>
     </AuthenticatedLayout>
