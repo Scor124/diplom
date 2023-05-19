@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function () {
     //Route::middleware('is-verified')->group(function (){
         Route::get('/dashboard', function () {
             return Inertia::render('Dashboard',[
+                'id' => Auth::user()->id,
                 'isTeacher' => Auth::user()->is_teacher,
                 'isVerified' => Auth::user()->is_verified
             ]);

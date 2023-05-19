@@ -20,12 +20,12 @@ Route::middleware(['api'])->group(function (){
     //Route::middleware('is-admin')->group(function (){
         Route::get('students',[APIDataController::class,'getStudents']);
         Route::get('student/{id}',[APIDataController::class,'getStudent']);
-        Route::post('student/update/{id}',[APIDataController::class,'updateStudent']);
+        Route::put('student/update/{id}',[APIDataController::class,'updateStudent']);
         Route::post('student/create',[APIDataController::class,'createStudent']);
         Route::delete('student/delete/{id}',[APIDataController::class,'deleteStudent']);
         Route::get('teachers',[APIDataController::class,'getTeachers']);
         Route::get('teachers/{id}',[APIDataController::class,'getTeacher']);
-        Route::post('teachers/update/{id}',[APIDataController::class,'updateTeacher']);
+        Route::put('teachers/update/{id}',[APIDataController::class,'updateTeacher']);
         Route::post('teachers/create',[APIDataController::class,'createTeacher']);
         Route::delete('teachers/delete/{id}',[APIDataController::class,'deleteTeacher']);
         Route::get('users',[APIDataController::class,'getUsers']);
