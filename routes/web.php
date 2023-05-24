@@ -23,7 +23,6 @@ Route::get('/about',function (){
 })->name('about');
 
 Route::middleware('auth')->group(function () {
-
     //Route::middleware('is-verified')->group(function (){
         Route::get('/dashboard', function () {
             return Inertia::render('Dashboard',[
@@ -53,6 +52,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/classes',function (){
             return Inertia::render('Admin/ClassesPage');
         })->name('admin.classes');
+        Route::get('/admin/classes/add',function (){
+            return Inertia::render('Admin/ClassAddPage');
+        })->name('admin.classes.add');
     //});
     Route::get('/mymarks',function (){
         return Inertia::render('MyMarks');

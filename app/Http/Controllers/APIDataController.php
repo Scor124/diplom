@@ -6,23 +6,33 @@ use App\Models\Classes;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
+use Date;
+use Hash;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Inertia\Testing\Concerns\Has;
+use function MongoDB\BSON\fromJSON;
+use function MongoDB\BSON\toJSON;
 
 class APIDataController extends Controller
 {
 
     public function createUser(Request $request)
     {
-        /*
-        $user = new User([
+        //$pass = fromJSON($request->only('password'));
+        $user = User::create([
             'name' => $request->only('name'),
-
+            'email' => $request->only('email'),
+            'password' => $request->only('password'),
+            'created_at' => new Date(),
+            'updated_at' => new Date()
         ]);
-        $request->all('password') = \Hash::make($request->only('password'));
-        */
-        $user = User::create($request->all());
+        $user->password = Hash::make(str($pass));
+        $user->save();
+        /*
+                $request->all('password') = \Hash::make($request->only('password'));
+                */
+        //$user = User::create([$request->all(['name','email']),'password' => ]);
         return response()->json($user, 201);
     }
 

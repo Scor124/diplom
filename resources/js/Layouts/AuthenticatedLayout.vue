@@ -144,7 +144,7 @@ const showingNavigationDropdown = ref(false);
             </header>
 
             <!-- Page Content -->
-            <main>
+            <main class="dark:bg-dots-lighter">
                 <slot />
             </main>
         </div>

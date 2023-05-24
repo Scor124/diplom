@@ -7,20 +7,20 @@ export default{
     data(){
         return{
             name: '',
-            email: '',
-            password: '',
+            formation_date: new Date()
         }
     },
     methods: {
         addUser: function () {
-            axios.post('/api/users/create', {
+            let group = {
                 name: this.name,
-                email: this.email,
-                password: this.password
-            })
+                formation_date: this.formation_date
+            };
+
+            axios.post('/api/classes/create', group) // change /users to your API endpoint
                 .then(function (response) {
                     console.log(response);
-                    alert('User added successfully!');
+                    alert('Group added successfully!');
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -31,23 +31,19 @@ export default{
 </script>
 
 <template>
-    <Head title="Добавление пользователя"></Head>
+    <Head title="Добавление класса"></Head>
     <AuthenticatedLayout>
         <div class="container-fluid text-center">
             <div class="justify-content-center bg-gray-500 rounded">
-                <h1>Add User</h1>
+                <h1>Добавить группу</h1>
                 <form class="container-fluid">
                     <fieldset class="col-auto">
-                        <label>Ф.И.О.:</label>
+                        <label>Название группы:</label>
                         <input class="form-control" type="text" v-model="name">
                     </fieldset>
                     <fieldset class="col-auto">
-                        <label>Почта:</label>
-                        <input class="form-control" type="email" v-model="email">
-                    </fieldset>
-                    <fieldset class="col-auto">
-                        <label>Пароль:</label>
-                        <input class="form-control" type="password" v-model="password">
+                        <label>Дата создания:</label>
+                        <input class="form-control" type="date" v-model="formation_date">
                     </fieldset>
                     <fieldset class="flex h-4 justify-content-center mt-4">
                         <button class="btn btn-primary col-auto" type="submit" v-on:click.prevent="addUser()">Добавить</button>
@@ -55,8 +51,6 @@ export default{
                 </form>
             </div>
         </div>
-
-
     </AuthenticatedLayout>
 </template>
 
