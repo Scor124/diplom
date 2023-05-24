@@ -34,31 +34,33 @@ Route::middleware('auth')->group(function () {
         Route::get('/marks',function (){
             return Inertia::render('MarksPage');
         })->name('marks');
-        Route::get('/classes',function (){
-            return DB::table('classes')->get();
-        })->name('classes');
     //});
+    // Страница ученика
+    Route::get('/mymarks',function (){
+        return Inertia::render('MyMarks');
+    })->name('mymarks');
 
-    //Route::middleware(['is-admin'])->group(function (){
+    // Cтраницы для учителей
+    /*
+     * Route::middleware()->group(function (){});
+     */
+
+    // Страницы для администратора
+    Route::middleware(['check.user.id'])->group(function (){
         Route::get('/admin/students',function (){
             return Inertia::render('Admin/StudentsPage');
         })->name('admin.students');
         Route::get('/admin/users',function (){
             return Inertia::render('Admin/UsersPage');
         })->name('admin.users');
-        Route::get('/admin/users/add',function (){
-            return Inertia::render('Admin/UserAddPage');
-        })->name('admin.users.add');
         Route::get('/admin/classes',function (){
             return Inertia::render('Admin/ClassesPage');
         })->name('admin.classes');
         Route::get('/admin/classes/add',function (){
             return Inertia::render('Admin/ClassAddPage');
         })->name('admin.classes.add');
-    //});
-    Route::get('/mymarks',function (){
-        return Inertia::render('MyMarks');
-    })->name('mymarks');
+    });
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

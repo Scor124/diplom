@@ -63,7 +63,7 @@ export default{
                         <span class="input-group-text bg-transparent border-0"><i class="fa fa-search"></i></span>
                     </div>
                 </div>
-                    <div class="col-auto rounded-pill">
+                    <div class="rounded-pill">
                         <table class="table mx-auto scroll-m-0.5 overscroll-y-auto table-striped table-hover text-gray-300">
                             <thead>
                             <tr>

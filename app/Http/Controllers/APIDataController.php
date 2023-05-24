@@ -11,29 +11,31 @@ use Hash;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Inertia\Testing\Concerns\Has;
-use function MongoDB\BSON\fromJSON;
-use function MongoDB\BSON\toJSON;
 
 class APIDataController extends Controller
 {
 
     public function createUser(Request $request)
     {
-        //$pass = fromJSON($request->only('password'));
-        $user = User::create([
-            'name' => $request->only('name'),
-            'email' => $request->only('email'),
-            'password' => $request->only('password'),
-            'created_at' => new Date(),
-            'updated_at' => new Date()
-        ]);
-        $user->password = Hash::make(str($pass));
+        // Получаем данные из запроса
+        $name = $request->input('name');
+        $email = $request->input('email');
+        $password = $request->input('password');
+
+        // Хешируем пароль с помощью Hash::make()
+        $hashedPassword = Hash::make($password);
+
+        // Создаем нового пользователя в базе данных
+        $user = new User;
+        $user->name = $name;
+        $user->email = $email;
+        $user->password = $hashedPassword;
         $user->save();
-        /*
-                $request->all('password') = \Hash::make($request->only('password'));
-                */
-        //$user = User::create([$request->all(['name','email']),'password' => ]);
-        return response()->json($user, 201);
+
+        return response()->json([
+            'message' => 'User created successfully',
+            'user' => $user
+        ], 201);
     }
 
     public function updateUser(Request $request, $id)

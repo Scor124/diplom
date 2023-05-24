@@ -38,6 +38,9 @@ Route::middleware(['api'])->group(function (){
 
     Route::get('classes', [APIDataController::class, 'getClasses']);
 });
+Route::middleware(['auth','api'])->get('/thisuser',function (Request $request){
+    return response()->json(Auth::user());
+});
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
