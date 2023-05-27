@@ -87,15 +87,36 @@ class APIDataController extends Controller
     }
     public function createStudent(Request $request)
     {
-        $student = $request->all();
+        $student = [$request->input('name'),$request->input('email'),$request->input('password')];
 
-        if (Student::where('UserID', $student['UserID'])->exists()) {
-            return response()->json(['message' => 'User already exists in students table'], 409);
+        $user = User::where([
+            'name' => $student['name'],
+            'email' => $student['email'],
+        ])->first();
+
+        if ($user || Student::where('UserID', $user->id)->exists()){
+            return response()->json(['message' => 'Пользователь уже существует!'], 409);
+        }
+        if (Teacher::where('UserID', $user->id)->exists()) {
+            return response()->json(['message' => 'Этот пользователь является учителем!'],409);
         }
 
-        $result = Student::create($student);
+        $user = new User;
+        $user->name = $student['name'];
+        $user->email = $student['email'];
+        $user->password = Hash::make($student['password']);
+        $user->save();
 
-        return response()->json($result, 201);
+        $student = new Student;
+        $student->UserID = $user->id;
+        $student->class_id = $request->input('class_id');
+        $student->save();
+
+        return response()->json([
+            'message' => 'Студент создан успешно!',
+            'user' => $user,
+            'group' => $student->class_id,
+        ], 201);
     }
 
     public function updateStudent(Request $request, $id)
@@ -265,5 +286,9 @@ class APIDataController extends Controller
         }
 
         return response()->json($class);
+    }
+    public function getClassStudents($id) {
+        // Студенты выбранной группы
+        return response()->json(Student::where('class_id', $id));
     }
 }

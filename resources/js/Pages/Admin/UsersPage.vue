@@ -4,7 +4,6 @@ import {Head} from "@inertiajs/vue3";
 import axios from "axios";
 </script>
 <script>
-
 import UserAddPage from "@/Pages/Admin/UserAddPage.vue";
 export default {
     components:{UserAddPage},

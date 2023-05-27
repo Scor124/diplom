@@ -3,7 +3,6 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {Head} from "@inertiajs/vue3";
 
 export default{
-    components: {AuthenticatedLayout},
     data(){
         return{
             name: '',
@@ -16,7 +15,6 @@ export default{
                 name: this.name,
                 formation_date: this.formation_date
             };
-
             axios.post('/api/classes/create', group) // change /users to your API endpoint
                 .then(function (response) {
                     console.log(response);
@@ -31,10 +29,8 @@ export default{
 </script>
 
 <template>
-    <Head title="Добавление класса"></Head>
-    <AuthenticatedLayout>
         <div class="container-fluid text-center">
-            <div class="justify-content-center bg-gray-500 rounded">
+            <div class="justify-content-center bg-transparent rounded">
                 <h1>Добавить группу</h1>
                 <form class="container-fluid">
                     <fieldset class="col-auto">
@@ -45,15 +41,10 @@ export default{
                         <label>Дата создания:</label>
                         <input class="form-control" type="date" v-model="formation_date">
                     </fieldset>
-                    <fieldset class="flex h-4 justify-content-center mt-4">
-                        <button class="btn btn-primary col-auto" type="submit" v-on:click.prevent="addUser()">Добавить</button>
+                    <fieldset class="flex h-10 justify-content-center mt-4">
+                        <button class="btn btn-success col-auto" type="submit" v-on:click.prevent="addUser()">Добавить</button>
                     </fieldset>
                 </form>
             </div>
         </div>
-    </AuthenticatedLayout>
 </template>
-
-<style scoped>
-
-</style>

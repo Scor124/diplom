@@ -40,24 +40,16 @@ defineProps({
                                             Студенты
                                         </Link>
                                     </div>
-                                    <div class="container-fluid flex justify-center font-semibold">
-                                        <Link v-if="isTeacher" :href="route('classes')" :ref="route('classes')">
-                                            Посмортеть группы
-                                        </Link>
-                                        <template v-else>
-                                            <div>
-                                                <Link :href="route('mymarks')" :ref="route('mymarks')">
-                                                    Посмортеть оценки
-                                                </Link>
-                                            </div>
-                                        </template>
+                                    <div v-if="isTeacher = false" class="container-fluid flex justify-center font-semibold">
+                                        <div >
+                                            <Link :href="route('mymarks')" :ref="route('mymarks')">
+                                                Посмортеть оценки
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-
-
                     </div>
                 </div>
             </div>
