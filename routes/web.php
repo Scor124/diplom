@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\APIDataController;
 use App\Http\Controllers\ProfileController;
 use Auth;
 use DB;
@@ -47,6 +48,7 @@ Route::middleware('auth')->group(function () {
 
     // Страницы для администратора
     Route::middleware(['check.user.id'])->group(function (){
+        // Страницы администрирования данными и пользователями
         Route::get('/admin/students',function (){
             return Inertia::render('Admin/StudentsPage');
         })->name('admin.students');
@@ -59,6 +61,31 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/classes/add',function (){
             return Inertia::render('Admin/ClassAddPage');
         })->name('admin.classes.add');
+
+        //
+        Route::get('/students',[APIDataController::class,'getStudents']);
+        Route::get('/student/{id}',[APIDataController::class,'getStudent']);
+        Route::put('/student/update/{id}',[APIDataController::class,'updateStudent']);
+        Route::post('/student/create',[APIDataController::class,'createStudent']);
+        Route::delete('/student/delete/{id}',[APIDataController::class,'deleteStudent']);
+
+        Route::get('/teachers',[APIDataController::class,'getTeachers']);
+        Route::get('/teachers/{id}',[APIDataController::class,'getTeacher']);
+        Route::put('/teachers/update/{id}',[APIDataController::class,'updateTeacher']);
+        Route::post('/teachers/create',[APIDataController::class,'createTeacher']);
+        Route::delete('/teachers/delete/{id}',[APIDataController::class,'deleteTeacher']);
+
+        Route::get('/users',[APIDataController::class,'getUsers']);
+        Route::get('/users/{id}',[APIDataController::class,'getUser']);
+        Route::put('/users/update/{id}',[APIDataController::class,'updateUser']);
+        Route::post('/users/create',[APIDataController::class,'createUser']);
+        Route::delete('/users/delete/{id}',[APIDataController::class,'deleteUser']);
+
+        Route::get('/classes', [APIDataController::class, 'getClasses']);
+        Route::get('/classes/{id}', [APIDataController::class, 'getClass']);
+        Route::post('/classes/create', [APIDataController::class,'createClass']);
+        Route::delete('/classes/delete/{id}', [APIDataController::class, 'deleteClass']);
+        Route::get('/classes/{id}/students', [APIDataController::class, 'getStudentsByGroupId']);
     });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

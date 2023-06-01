@@ -34,12 +34,6 @@ export default {
         axios.get('/api/students').then(response => {
             this.students = response.data
         });
-        axios.get('/api/teachers').then(response => {
-            this.students = response.data
-        });
-        axios.get('/api/users').then(response => {
-            this.students = response.data
-        });
 
     },
     methods: {

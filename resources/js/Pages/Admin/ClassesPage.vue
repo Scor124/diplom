@@ -15,22 +15,28 @@ export default{
         };
     },
     mounted() {
-        axios.get('/api/classes')
+        axios.get('/classes')
             .then((response) => this.classes = response.data)
             .catch(error => {console.log(error.response.data.message)});
+        console.log(this.classes)
     },
     beforeDestroy() {
         // Удаляем обработчик событий при уничтожении компонента
         document.removeEventListener('keydown', this.handleTabKey);
     },
     methods: {
+        updateGroupList(){
+            axios.get('/classes')
+                .then((response) => this.classes = response.data)
+                .catch(error => {console.log(error.response.data.message)});
+        },
         handleTabKey(event) {
             if (this.showModal && event.key === 'Tab') {
                 event.preventDefault();
             }
         },
         updateGroup(group) {
-            axios.put(`/api/classes/update/${group.id}/`, {
+            axios.put(`/classes/update/${group.id}/`, {
                 name: group.name
             },{
                 headers: {
@@ -42,9 +48,9 @@ export default{
         },
         deleteGroup(group){
             if(confirm(`Вы точно хотите удалить ${group.name}?`)){
-                axios.delete(`/api/classes/delete/${group.id}`)
+                axios.delete(`/classes/delete/${group.id}`)
                     .then(response => {
-                        axios.get('/api/classes')
+                        axios.get('/classes')
                             .then((response) => this.users = response.data)
                             .catch(error => {console.log(error.response.data.message)});
                     })
@@ -70,11 +76,9 @@ export default{
         <div v-if="showModal"  style="position: fixed;    z-index: 9999;    top: 0;    left: 0;    width: 100%;    height: 100%;    background-color: rgba(0, 0, 0, 0.5);">
             <div class="bg-gray-600 rounded-5" style="position: absolute;    top: 50%;    left: 50%;    transform: translate(-50%, -50%);        border-radius: 5px;    padding: 20px;">
                 <div class="float-end">
-                    <button class="btn btn-close hover:bg-red-700" @click="showModal = false"></button>
+                    <button class="btn btn-close hover:bg-red-700" @click="showModal = false;updateGroupList"></button>
                 </div>
-                <ClassesAddPage @close="axios.get('/api/classes')
-                            .then((response) => this.classes = response.data)
-                            .catch(error => {console.log(error.response.data.message)});"/>
+                <ClassesAddPage/>
             </div>
         </div>
         <div class="py-12 ">

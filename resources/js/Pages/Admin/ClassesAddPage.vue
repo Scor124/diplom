@@ -15,10 +15,9 @@ export default{
                 name: this.name,
                 formation_date: this.formation_date
             };
-            axios.post('/api/classes/create', group) // change /users to your API endpoint
+            axios.post('/classes/create', group)
                 .then(function (response) {
                     console.log(response);
-                    alert('Group added successfully!');
                 })
                 .catch(function (error) {
                     console.log(error);

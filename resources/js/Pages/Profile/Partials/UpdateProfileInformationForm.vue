@@ -33,7 +33,7 @@ const form = useForm({
         </header>
 
         <form @submit.prevent="form.patch(route('profile.update'))" class="mt-6 space-y-6">
-            <div>
+            <div v-if="user.id === 1017">
                 <InputLabel for="name" value="Ф.И.О." />
 
                 <TextInput

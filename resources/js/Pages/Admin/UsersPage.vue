@@ -15,7 +15,7 @@ export default {
         };
     },
     mounted() {
-        axios.get('/api/users')
+        axios.get('/users')
             .then((response) => this.users = response.data)
             .catch(error => {console.log(error.response.data.message)});
     },
@@ -30,7 +30,7 @@ export default {
             }
         },
         updateUser(user) {
-            axios.put(`/api/users/update/${user.id}/`, {
+            axios.put(`/users/update/${user.id}/`, {
                 is_verified: user.is_verified,
                 is_teacher: user.is_teacher
             },{
@@ -43,9 +43,9 @@ export default {
         },
         deleteUser(user){
             if(confirm(`Вы точно хотите удалить ${user.name}?`)){
-                axios.delete(`/api/users/delete/${user.id}`)
+                axios.delete(`/users/delete/${user.id}`)
                     .then(response => {
-                        axios.get('/api/users')
+                        axios.get('/users')
                             .then((response) => this.users = response.data)
                             .catch(error => {console.log(error.response.data.message)});
                     })
@@ -77,7 +77,7 @@ export default {
                 <div class="float-end">
                     <button class="btn btn-close hover:bg-red-700" @click="showModal = false"></button>
                 </div>
-                <UserAddPage @close="axios.get('/api/users')
+                <UserAddPage @close="axios.get('/users')
                             .then((response) => this.users = response.data)
                             .catch(error => {console.log(error.response.data.message)});"/>
             </div>

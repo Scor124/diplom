@@ -10,7 +10,6 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
- * @method static where(string $string, mixed $UserID)
  * @method static create($student)
  */
 class Student extends Model
@@ -19,6 +18,5 @@ class Student extends Model
 
     protected $table = 'students';
     public $timestamps = false;
-
-    protected $fillable = ['name', 'class_id', 'UserID'];
+    protected $fillable = ['UserID', 'class_id'];
 }

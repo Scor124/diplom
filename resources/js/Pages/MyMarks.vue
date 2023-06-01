@@ -1,5 +1,6 @@
 <script setup>
 import StudentsAuthLayout from "@/Layouts/StudentsAuthLayout.vue";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 </script>
 <script>
 export default {
@@ -32,7 +33,7 @@ export default {
 };
 </script>
 <template>
-    <StudentsAuthLayout>
+    <AuthenticatedLayout>
         <div>
             <h2>Оценки по предметам:</h2>
             <table>
@@ -50,7 +51,7 @@ export default {
                 </tbody>
             </table>
         </div>
-    </StudentsAuthLayout>
+    </AuthenticatedLayout>
 </template>
 
 <style scoped>

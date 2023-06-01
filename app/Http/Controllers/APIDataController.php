@@ -7,6 +7,7 @@ use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
 use Date;
+use DB;
 use Hash;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -14,7 +15,6 @@ use Inertia\Testing\Concerns\Has;
 
 class APIDataController extends Controller
 {
-
     public function createUser(Request $request)
     {
         // Получаем данные из запроса
@@ -37,26 +37,30 @@ class APIDataController extends Controller
             'user' => $user
         ], 201);
     }
-
     public function updateUser(Request $request, $id)
     {
-
         $user = User::find($id);
-
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
-        $user->is_verified = $request->input('is_verified');
-        $user->is_teacher = $request->input('is_teacher');
-        //$user->fill($request->all());
+        if (!is_null($request->input('name'))){
+            $user->name = $request->input('name');
+        }
+        if (!is_null($request->input('is_verified'))){
+            $user->is_verified = $request->input('is_verified');
+        }
+        if (!is_null($request->input('is_teacher'))){
+            $user->is_teacher = $request->input('is_teacher');
+        }
+        if (!is_null($request->input('password'))){
+            $user->password = Hash::make($request->input('password'));
+        }
         $user->save();
-
         return response()->json([
             'message' => 'User update successfully',
             'data' => $user
         ]);
     }
-
     public function deleteUser($id)
     {
         $user = User::find($id);
@@ -69,7 +73,6 @@ class APIDataController extends Controller
 
         return response()->json(['message' => 'User deleted']);
     }
-
     public function getUser($id)
     {
         $user = User::find($id);
@@ -80,7 +83,6 @@ class APIDataController extends Controller
 
         return response()->json($user);
     }
-
     public function getUsers()
     {
         return response(User::all());
@@ -88,37 +90,36 @@ class APIDataController extends Controller
     public function createStudent(Request $request)
     {
         $student = [$request->input('name'),$request->input('email'),$request->input('password')];
-
-        $user = User::where([
-            'name' => $student['name'],
-            'email' => $student['email'],
-        ])->first();
-
-        if ($user || Student::where('UserID', $user->id)->exists()){
-            return response()->json(['message' => 'Пользователь уже существует!'], 409);
+        $class = $request->input('class_id');
+        $user = User::where('email','=',$student[1]);
+        if ($user->exists()){
+            if (Student::where('UserID', $user->id)->exists()){
+                return response()->json(['message' => 'Пользователь уже существует!'], 409);
+            }
+            if (Teacher::where('UserID', $user->id)->exists()) {
+                return response()->json(['message' => 'Этот пользователь является учителем!'],409);
+            }
+            return response()->json(['message' => 'Обратитесь к администратору']);
         }
-        if (Teacher::where('UserID', $user->id)->exists()) {
-            return response()->json(['message' => 'Этот пользователь является учителем!'],409);
-        }
-
         $user = new User;
-        $user->name = $student['name'];
-        $user->email = $student['email'];
-        $user->password = Hash::make($student['password']);
+        $user->name = $student[0];
+        $user->email = $student[1];
+        $user->password = Hash::make($student[2]);
+        $user->is_verified = false;
+        $user->is_teacher = false;
         $user->save();
-
+        echo $user;
         $student = new Student;
         $student->UserID = $user->id;
-        $student->class_id = $request->input('class_id');
+        $student->class_id = $class;
         $student->save();
-
+        echo $student;
         return response()->json([
             'message' => 'Студент создан успешно!',
             'user' => $user,
             'group' => $student->class_id,
         ], 201);
     }
-
     public function updateStudent(Request $request, $id)
     {
         $student = Student::find($id);
@@ -137,7 +138,6 @@ class APIDataController extends Controller
 
         return response()->json($student);
     }
-
     public function deleteStudent($id)
     {
         $student = Student::find($id);
@@ -164,7 +164,6 @@ class APIDataController extends Controller
 
         return response()->json($student);
     }
-
     public function createTeacher(Request $request)
     {
         $teacher = $request->all();
@@ -179,7 +178,6 @@ class APIDataController extends Controller
 
         return response()->json($result, 201);
     }
-
     public function updateTeacher(Request $request, $id)
     {
         $teacher = Teacher::find($id);
@@ -199,7 +197,6 @@ class APIDataController extends Controller
 
         return response()->json($teacher);
     }
-
     public function deleteTeacher($id)
     {
         $teacher = Teacher::find($id);
@@ -212,7 +209,6 @@ class APIDataController extends Controller
 
         return response()->json(['message' => 'Teacher deleted']);
     }
-
     public function getTeachers()
     {
         return response()->json(Teacher::all());
@@ -227,55 +223,27 @@ class APIDataController extends Controller
 
         return response()->json($teacher);
     }
-
     public function createClass(Request $request)
     {
         $class = $request->all();
-
-        if (!Teacher::find($class['teacher_id'])) {
-            return response()->json(['message' => 'Teacher not found'], 404);
-        }
-
         $result = Classes::create($class);
-
         return response()->json($result, 201);
     }
-
-    public function updateClass(Request $request, $id)
-    {
-        $class = Classes::find($id);
-
-        if (!$class) {
-            return response()->json(['message' => 'Class not found'], 404);
-        }
-
-        $class->fill($request->all());
-
-        if (!Teacher::find($class['teacher_id'])) {
-            return response()->json(['message' => 'Teacher not found'], 404);
-        }
-
-        $class->save();
-
-        return response()->json($class);
-    }
-
     public function deleteClass($id)
     {
-        $class = Classes::find($id);
-
+        $class = Classes::findOrFail($id);
         if (!$class) {
             return response()->json(['message' => 'Class not found'], 404);
         }
-
+        if (Student::where('class_id','=',$class->id)->count() > 0){
+            return response()->json(['message' => 'Невозможно удалить класс так как в нем находятся студенты!'], 422);
+        }
         $class->delete();
-
-        return response()->json(['message' => 'Class deleted']);
+        return response()->json(['message' => 'Удалено']);
     }
     public function getClasses()
     {
         return response(Classes::all());
-        //return response()->json(Classes::all());
     }
     public function getClass($id)
     {
@@ -287,8 +255,17 @@ class APIDataController extends Controller
 
         return response()->json($class);
     }
-    public function getClassStudents($id) {
-        // Студенты выбранной группы
-        return response()->json(Student::where('class_id', $id));
+    public function getStudentsByGroupId($groupId) {
+        $students = Student::where('class_id', '=', $groupId)->get();
+
+        $userIds = [];
+        foreach ($students as $student) {
+            $userIds[] = $student->UserID;
+        }
+
+        $users = User::whereIn('id', $userIds)->get();
+
+        return $users;
     }
 }
+

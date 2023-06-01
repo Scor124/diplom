@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\CheckUserIdMiddleware;
 use App\Http\Middleware\IsVerifiedMiddleware;
 use App\Http\Middleware\RolesMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;

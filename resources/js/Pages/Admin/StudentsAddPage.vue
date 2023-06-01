@@ -1,11 +1,14 @@
-<script>
-defineProps({
-    groupId:{
-        type: BigInt,
-    },
+<script setup>
+const props = defineProps({
+    groupId: {
+        type: Number
+    }
 });
+console.log(props);
+</script>
+
+<script>
 export default{
-    components: {},
     data(){
         return{
             name: '',
@@ -14,17 +17,18 @@ export default{
         }
     },
     methods: {
-        addStudent: function () {
-            axios.post('/api/student/create', {
+        addStudent(groupId) {
+            axios.post('/student/create', {
                 name: this.name,
                 email: this.email,
                 password: this.password,
-                class_id: this.groupId
+                is_verified: false,
+                is_teacher: false,
+                class_id: groupId,
             })
                 .then(function (response) {
                     console.log(response);
                     alert('Студент создан!');
-
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -38,10 +42,10 @@ export default{
     <div class="container-fluid text-center">
         <div class="bg-transparent container mt-5">
             <h1>Добавление студента</h1>
-            <form @submit.prevent="addStudent" class="mt-4">
+            <form @submit.prevent="addStudent(groupId)" class="mt-4">
                 <!-- Поле имя -->
                 <div class="mb-3">
-                    <label for="name" class="form-label">Имя</label>
+                    <label for="name" class="form-label">Ф.И.О.</label>
                     <input type="text" v-model="name" class="form-control" id="name" required>
                 </div>
                 <!-- Поле email -->
