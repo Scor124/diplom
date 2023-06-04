@@ -6,46 +6,94 @@ import DropdownLink from "@/Components/DropdownLink.vue";
 </script>
 
 <script>
+import {usePage} from "@inertiajs/vue3";
+import axios from "axios";
+const months = [
+    { id: 1, name: 'Январь' },
+    { id: 2, name: 'Февраль' },
+    { id: 3, name: 'Март' },
+    { id: 4, name: 'Апрель' },
+    { id: 5, name: 'Май' },
+    { id: 6, name: 'Июнь' },
+    { id: 7, name: 'Июль' },
+    { id: 8, name: 'Август' },
+    { id: 9, name: 'Сентябрь' },
+    { id: 10, name: 'Октябрь' },
+    { id: 11, name: 'Ноябрь' },
+    { id: 12, name: 'Декабрь' }
+];
+const right_now = new Date();
+right_now.setMonth(right_now.getMonth()+1);
 export default {
     data() {
         return {
-            users: [],
-            students: [],
             classes: [],
+            subjects: [],
+            students: [],
+            marks: [],
+
+            searchClass: '',
+            searchSubject: '',
+
             selectedClass: null,
-            selectedOption: 'current',
-            months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+            selectedSubject: null,
+
+            selectedMonth: right_now.getMonth(),
+            selectedYear: right_now.getFullYear(),
         }
     },
     computed: {
         daysInMonth() {
-            const date = new Date();
-            const year = date.getFullYear();
-            const month = date.getMonth() + 1;
-            const daysInMonth = new Date(year, month, 0).getDate();
+            const daysInMonth = new Date(this.selectedYear, this.selectedMonth, 0).getDate();
             const daysArray = [];
             for (let i = 1; i <= daysInMonth; i++) {
                 daysArray.push(i);
             }
             return daysArray;
+        },
+        filtredGroups() {
+            if (this.searchClass === ''){
+                return this.classes
+            }
+            return this.classes.filter(classes => classes.name.toLowerCase().includes(this.searchClass.toLowerCase()))
+        },
+        filtredSubjects(){
+            if (this.searchSubject === ''){
+                return this.subjects
+            }
+            return this.subjects.filter(subject => subject.name.toLowerCase().includes(this.searchSubject.toLowerCase()))
         }
     },
     mounted() {
-        axios.get('/api/students').then(response => {
-            this.students = response.data
-        });
-
+        axios.get('/classes')
+            .then(response => {
+                this.classes = response.data;
+                console.log(response);
+            })
+            .catch(error => console.log(error.message))
     },
     methods: {
         getAttendance(attendance, day) {
+
             const attendanceObject = attendance.find(a => new Date(a.date).getDate() === day);
             return attendanceObject ? attendanceObject.status : "-";
         },
-        showStudents(classId) {
-            this.selectedClass = this.classes.find(cls => cls.id === classId);
+        showSubjects(classId){
+            this.selectedSubject = null;
+            this.selectedClass = classId;
+            axios.get(`/classes/${classId}/subjects`).then(response =>{
+                this.subjects = response.data
+            }).catch()
         },
-        updateData() {
-            this.data = this.options[this.selectedOption];
+        subjectChanged(classId){
+            axios.get(`/classes/${classId}/students`).then(response =>{
+                this.students = response.data
+            }).catch()
+
+        },
+        resetDates(){
+            this.selectedMonth = right_now.getMonth();
+            this.selectedYear = right_now.getFullYear();
         },
     }
 }
@@ -53,69 +101,82 @@ export default {
 
 <template>
     <Head title="Выставление оценок"></Head>
-
     <AuthenticatedLayout>
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                    <table>
-                        <tr>
-                            <td>
+                <div class="bg-gray-300 dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-3 container">
+                        <div class="row container">
+                            <!-- Для классов столбец -->
+                            <div class="col-3 p-3 rounded-1 border-white border-2 w-1/5">
+                                <h5 class="text-center w-full text-white mb-2">Список классов</h5>
+                                <input type="search" v-model="searchClass" class="h-7 w-full px-2 mb-4" placeholder="Введите название класса">
                                 <div class="scrollable">
-                                    <h1>Список классов</h1>
-                                    <table>
+                                    <table class="text-gray-50 table">
                                         <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Название</th>
-                                        </tr>
+                                            <tr>
+                                                <th>Название</th>
+                                            </tr>
                                         </thead>
                                         <tbody>
-                                        <tr v-for="cls in classes" :key="cls.id" @click="showStudents(cls.id)">
-                                            <td>{{ cls.id }}</td>
-                                            <td>{{ cls.name }}</td>
-                                        </tr>
+                                            <tr v-for="cls in filtredGroups" :key="cls.id">
+                                                <td class="w-full justify-center">
+                                                    <button class="btn-link w-full" @click="showSubjects(cls.id)">{{ cls.name }}</button>
+                                                </td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
-                            </td>
-                            <td >
-                                <h2 v-if="selectedClass">Студенты класса "{{ selectedClass.name }}"</h2>
-                                <ul v-if="selectedClass">
-                                    <li v-for="student in students" :key="student.id">{{ student.name }}</li>
-                                </ul>
-                            </td>
-                            <td>
-                                <div>
-                                    <select v-model="selectedOption" @change="updateData">
-                                        <option value="option1"></option>
-                                        <option value="option2">Option 2</option>
-                                        <option value="option3">Option 3</option>
+                            </div>
+                            <!-- Для предметов столбец -->
+                            <div class="col-3 p-3 rounded-1 border-white border-2 w-1/5" v-if="selectedClass!=null">
+                                <h5 class="text-center w-full text-white mb-2">Список предметов</h5>
+                                <input type="search" v-model="searchSubject" class="h-7 w-full px-2 mb-3" placeholder="Введите название предмета">
+                                <div class="w-full p-4 justify-center">
+                                    <select class="form-select rounded-5" v-model="selectedSubject">
+                                        <option v-for="subject in filtredSubjects" :key="subject.id" :value="subject.id" @select="subjectChanged(subject.id)">
+                                            {{ subject.name }}
+                                        </option>
                                     </select>
-                                    <table>
+                                </div>
+                            </div>
+                            <!-- Для оценок столбец -->
+                            <div class="col-6 p-3 rounded-1 border-white border-2 w-3/5" v-if="selectedClass!=null && selectedSubject!=null">
+                                <h5 class="text-center w-full text-white mb-2">Оценки</h5>
+                                <div class="h-10 w-full px-2 mb-2 d-flex justify-content-between">
+                                    <h1 class="text-white mx-auto">Выберите месяц</h1>
+                                    <select class="form-select rounded-5 mx-auto" v-model="selectedMonth">
+                                        <option v-for="month in months" :value="month.id" >{{ month.name }}</option>
+                                    </select>
+                                    <h1 class="text-white mx-auto">Выберите год</h1>
+                                    <select class="form-select rounded-5 mx-auto" v-model="selectedYear">
+                                        <option v-for="year in ['2019','2020','2021','2022','2023']" :value="year" >{{ year }}</option>
+                                    </select>
+                                    <button class="btn btn-outline-danger mx-auto" @click="resetDates">Сбросить</button>
+
+                                </div>
+                                <div class="scrollable-x table-responsive">
+                                    <table class="table table-striped-columns table-striped text-white">
                                         <thead>
-                                        <tr>
-                                            <th>Студент</th>
-                                            <th v-for="(day, index) in daysInMonth" :key="index">{{day}}</th>
-                                        </tr>
+                                            <tr>
+                                                <th>Студент</th>
+                                                <th v-for="(day, index) in daysInMonth" :key="index">{{ day }}</th>
+                                            </tr>
                                         </thead>
                                         <tbody>
-                                        <tr v-for="(student, index) in students" :key="index">
-                                            <td>{{student.name}}</td>
-                                            <td v-for="(day, index) in daysInMonth" :key="index">{{getAttendance(student.marks, day)}}</td>
-                                        </tr>
+                                            <tr v-for="student in students" :key="student.id">
+                                                <td>{{student.name}}</td>
+                                                <td v-for="(day, index) in daysInMonth" :key="index">{{ getAttendance(student.marks, day) }}</td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
-                            </td>
-                        </tr>
-                    </table>
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </AuthenticatedLayout>
 </template>
-
-<style scoped>
-
-</style>

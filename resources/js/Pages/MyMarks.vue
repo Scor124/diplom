@@ -3,6 +3,9 @@ import StudentsAuthLayout from "@/Layouts/StudentsAuthLayout.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 </script>
 <script>
+import {usePage} from "@inertiajs/vue3";
+
+const user = usePage().props.auth.user;
 export default {
     data() {
         return {
@@ -29,6 +32,11 @@ export default {
 
         // тут должен быть код для получения данных из базы
         // используйте axios или fetch
+    },
+    methods:{
+        getMarkForSubject(subject){
+
+        },
     },
 };
 </script>

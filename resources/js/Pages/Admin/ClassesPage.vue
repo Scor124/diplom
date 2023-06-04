@@ -12,6 +12,7 @@ export default{
             showModal: false,
             searchQuery: '',
             classes: [],
+            selectedGroup: null,
         };
     },
     mounted() {
@@ -25,6 +26,11 @@ export default{
         document.removeEventListener('keydown', this.handleTabKey);
     },
     methods: {
+        seeSubjects(id){
+            axios.get(`/admin/classes/${id}/subjects`).then((response)=> console.log(response.data)).catch(error => console.log(error));
+            //route('class.subjects',{'groupId': id});
+            window.location.href = `/admin/classes/${id}/subjects`;
+        },
         updateGroupList(){
             axios.get('/classes')
                 .then((response) => this.classes = response.data)
@@ -102,10 +108,13 @@ export default{
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-for="group in filteredGroups" :key="group.id" class="row-auto">
+                            <tr v-for="group in filteredGroups" :key="group.id" class="row-auto" @select="selectedGroup = group">
                                 <td class="px-3 align-middle">{{ group.name }}</td>
                                 <td class="px-3 align-middle">{{ group.formation_date }}</td>
-                                <td class="px-10 align-middle"><button class="btn btn-outline-danger hover:text-red-500 border-red-700" @click="deleteGroup(group)">Удалить</button></td>
+                                <td class="px-10 align-middle">
+                                    <button class="btn btn-outline-primary hover:text-blue-500 m-2" @click="seeSubjects(group.id)">Перейти к предметам</button>
+                                    <button class="btn btn-outline-danger hover:text-red-500  m-2" @click="deleteGroup(group)">Удалить</button>
+                                </td>
                             </tr>
                             </tbody>
                         </table>

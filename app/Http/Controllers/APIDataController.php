@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Classes;
 use App\Models\Student;
+use App\Models\Subjects;
 use App\Models\Teacher;
 use App\Models\User;
 use Date;
@@ -89,31 +90,30 @@ class APIDataController extends Controller
     }
     public function createStudent(Request $request)
     {
-        $student = [$request->input('name'),$request->input('email'),$request->input('password')];
         $class = $request->input('class_id');
-        $user = User::where('email','=',$student[1]);
-        if ($user->exists()){
-            if (Student::where('UserID', $user->id)->exists()){
+        $user = User::where('email','=',$request->input('email'))->first();
+        if ($user != null){
+            if (Student::where('UserID', '=', $user->id)->first() != null){
                 return response()->json(['message' => 'Пользователь уже существует!'], 409);
             }
-            if (Teacher::where('UserID', $user->id)->exists()) {
+            if (Teacher::where('UserID', '=', $user->id)->first() != null) {
                 return response()->json(['message' => 'Этот пользователь является учителем!'],409);
             }
             return response()->json(['message' => 'Обратитесь к администратору']);
         }
         $user = new User;
-        $user->name = $student[0];
-        $user->email = $student[1];
-        $user->password = Hash::make($student[2]);
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
+        $user->password = Hash::make($request->input('password'));
         $user->is_verified = false;
         $user->is_teacher = false;
         $user->save();
-        echo $user;
+
         $student = new Student;
         $student->UserID = $user->id;
         $student->class_id = $class;
         $student->save();
-        echo $student;
+
         return response()->json([
             'message' => 'Студент создан успешно!',
             'user' => $user,
@@ -140,7 +140,7 @@ class APIDataController extends Controller
     }
     public function deleteStudent($id)
     {
-        $student = Student::find($id);
+        $student = Student::where('UserID','=',$id)->first();
 
         if (!$student) {
             return response()->json(['message' => 'Student not found'], 404);
@@ -166,17 +166,35 @@ class APIDataController extends Controller
     }
     public function createTeacher(Request $request)
     {
-        $teacher = $request->all();
-
-        if (Teacher::where('UserId', $teacher['user_id'])->exists()
-            || Student::where('UserId', $teacher['UserId'])->exists()) {
-            return response()->json(['message' =>
-                'User already exists in teachers or students table'], 409);
+        $user = User::where('email','=', $request->input('email'))->first();
+        echo $user;
+        if ($user != null){
+            if (Student::where('UserID', '=', $user->id)->first() != null){
+                return response()->json(['message' => 'Этот пользователь является студентом!'], 409);
+            }
+            if (Teacher::where('UserID', '=', $user->id)->first() != null) {
+                return response()->json(['message' => 'Пользователь уже существует!'],409);
+            }
+            return response()->json(['message' => 'Обратитесь к администратору']);
         }
+        $user = new User;
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
+        $user->password = Hash::make($request->input('password'));
+        $user->is_verified = false;
+        $user->is_teacher = true;
+        $user->save();
 
-        $result = Teacher::create($teacher);
+        $teacher = new Teacher;
+        $teacher->UserID = $user->id;
+        $teacher->Qualification = $request->input('qualification');
+        $teacher->save();
 
-        return response()->json($result, 201);
+        return response()->json([
+            'message' => 'Учитель создан успешно!',
+            'user' => $user,
+        ], 201);
+
     }
     public function updateTeacher(Request $request, $id)
     {
@@ -211,7 +229,8 @@ class APIDataController extends Controller
     }
     public function getTeachers()
     {
-        return response()->json(Teacher::all());
+        $teachers = Teacher::with('user')->get();
+        return response()->json($teachers);
     }
     public function getTeacher($id)
     {
@@ -257,15 +276,19 @@ class APIDataController extends Controller
     }
     public function getStudentsByGroupId($groupId) {
         $students = Student::where('class_id', '=', $groupId)->get();
-
         $userIds = [];
         foreach ($students as $student) {
             $userIds[] = $student->UserID;
         }
-
         $users = User::whereIn('id', $userIds)->get();
-
         return $users;
+    }
+    public function getSubjectsOfGroup($groupId){
+        $subjects = Subjects::with('teacher.user')->where('classID','=',$groupId)->get();
+        return response()->json($subjects);
+    }
+    public function getStudentMarks($studentID){
+        return;
     }
 }
 

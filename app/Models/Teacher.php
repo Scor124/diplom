@@ -13,6 +13,17 @@ class Teacher extends Model
 {
     protected $table = 'teachers';
     public $timestamps = false;
-
-    protected $fillable = ['name', 'user_id'];
+    protected $fillable = [
+        'name',
+        'UserID',
+        'Qualification'
+    ];
+    public function user()
+    {
+        return $this->belongsTo(User::class,'UserID','id');
+    }
+    public function subjects()
+    {
+        return $this->hasMany(Subjects::class,'teacherID','id');
+    }
 }

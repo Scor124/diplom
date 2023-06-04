@@ -1,4 +1,5 @@
 <script setup>
+import axios from "axios";
 const props = defineProps({
     groupId: {
         type: Number
@@ -6,7 +7,6 @@ const props = defineProps({
 });
 console.log(props);
 </script>
-
 <script>
 export default{
     data(){
@@ -17,14 +17,12 @@ export default{
         }
     },
     methods: {
-        addStudent(groupId) {
+        addStudent() {
             axios.post('/student/create', {
                 name: this.name,
                 email: this.email,
                 password: this.password,
-                is_verified: false,
-                is_teacher: false,
-                class_id: groupId,
+                class_id: this.groupId
             })
                 .then(function (response) {
                     console.log(response);
@@ -42,7 +40,7 @@ export default{
     <div class="container-fluid text-center">
         <div class="bg-transparent container mt-5">
             <h1>Добавление студента</h1>
-            <form @submit.prevent="addStudent(groupId)" class="mt-4">
+            <form @submit.prevent="addStudent" class="mt-4">
                 <!-- Поле имя -->
                 <div class="mb-3">
                     <label for="name" class="form-label">Ф.И.О.</label>

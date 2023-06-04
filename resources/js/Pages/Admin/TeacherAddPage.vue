@@ -1,5 +1,5 @@
 <script setup>
-
+import axios from "axios";
 </script>
 <script>
 export default{
@@ -8,25 +8,22 @@ export default{
             name: '',
             email: '',
             password: '',
+            qualification: '',
         }
     },
     methods: {
-        addStudent(groupId) {
-            axios.post('/student/create', {
+        addTeacher() {
+            axios.post('/teachers/create', {
                 name: this.name,
                 email: this.email,
                 password: this.password,
-                is_verified: false,
-                is_teacher: false,
-                class_id: groupId,
+                qualification: this.qualification,
             })
                 .then(function (response) {
                     console.log(response);
-                    alert('Студент создан!');
+                    alert('Преподаватель создан!');
                 })
-                .catch(function (error) {
-                    console.log(error);
-                });
+                .catch(function (error) {console.log(error);});
         }
     }
 }
@@ -34,8 +31,8 @@ export default{
 <template>
     <div class="container-fluid text-center">
         <div class="bg-transparent container mt-5">
-            <h1>Добавление студента</h1>
-            <form @submit.prevent="addStudent(groupId)" class="mt-4">
+            <h1>Добавление преподавателя</h1>
+            <form @submit.prevent="addTeacher" class="mt-4">
                 <!-- Поле имя -->
                 <div class="mb-3">
                     <label for="name" class="form-label">Ф.И.О.</label>
@@ -45,6 +42,11 @@ export default{
                 <div class="mb-3">
                     <label for="email" class="form-label">Email адрес</label>
                     <input type="email" v-model="email" class="form-control" id="email" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="qualification" class="form-label">Специализация</label>
+                    <input type="text" v-model="qualification" class="form-control" id="qualification" required>
                 </div>
                 <!-- Поле пароль -->
                 <div class="mb-3 rounded-pill">

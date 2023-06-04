@@ -26,10 +26,10 @@ defineProps({
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-dots-darker dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                     <div>
-                        <div class="container mt-4">
+                        <div class="container">
                             <div class="row">
-                                <div class="col-12">
-                                    <div v-if="id===1017" class="container-fluid mx-2 px-3 d-flex justify-content-between">
+                                <div class="col-12 ">
+                                    <div v-if="id===1017" class="container-fluid m-5 p-3 d-flex justify-content-start">
                                         <Link class="btn btn-outline-secondary mx-2 hover:text-blue-400 text-gray-200" :href="route('admin.users')" :ref="route('admin.users')">
                                             Пользователи
                                         </Link>
@@ -38,6 +38,9 @@ defineProps({
                                         </Link>
                                         <Link class="btn btn-outline-primary mx-2 hover:text-blue-400 text-gray-200" :href="route('admin.students')" :ref="route('admin.students')">
                                             Студенты
+                                        </Link>
+                                        <Link class="btn btn-outline-primary mx-2 hover:text-blue-400 text-gray-200" :href="route('admin.teachers')" :ref="route('admin.teachers')">
+                                            Преподаватели
                                         </Link>
                                     </div>
                                     <div v-if="isTeacher = false" class="container-fluid flex justify-center font-semibold">

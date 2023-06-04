@@ -2,26 +2,24 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class Classes extends Model
+class Subjects extends Model
 {
     use Notifiable, HasApiTokens, HasFactory;
-    protected $table = 'classes';
+    protected $table = 'subjects';
     protected $primaryKey = 'id';
     protected $fillable = [
         'name',
-        'formation_date'
+        'classID',
+        'teacherID',
     ];
-    protected $casts = [
-        'formation_date' => 'datetime:Y-m-d',
-    ];
-
-
     public $timestamps = false;
+    public function teacher()
+    {
+        return $this->belongsTo(Teacher::class, 'teacherID','id');
+    }
 }

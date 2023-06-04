@@ -5,9 +5,10 @@ import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link } from '@inertiajs/vue3';
+import {Link, usePage} from '@inertiajs/vue3';
 
 const showingNavigationDropdown = ref(false);
+const user = usePage().props.auth.user;
 </script>
 
 <template>
@@ -31,6 +32,24 @@ const showingNavigationDropdown = ref(false);
                             <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                                 <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
                                     Активности
+                                </NavLink>
+                                <NavLink :href="route('admin.users')" :active="route().current('admin.users')" v-if="user.id === 1017">
+                                    Пользователи
+                                </NavLink>
+                                <NavLink :href="route('admin.classes')" :active="route().current('admin.classes')" v-if="user.id === 1017">
+                                    Группы
+                                </NavLink>
+                                <NavLink :href="route('admin.students')" :active="route().current('admin.students')" v-if="user.id === 1017">
+                                    Студенты
+                                </NavLink>
+                                <NavLink :href="route('admin.teachers')" :active="route().current('admin.teachers')" v-if="user.id === 1017">
+                                    Преподаватели
+                                </NavLink>
+                                <NavLink :href="route('mymarks')" :active="route().current('mymarks')" v-if="user.is_teacher === false">
+                                    Оценки
+                                </NavLink>
+                                <NavLink :href="route('marks')" :active="route().current('marks')" v-if="user.is_teacher === true">
+                                    Выставление оценок
                                 </NavLink>
                             </div>
                         </div>

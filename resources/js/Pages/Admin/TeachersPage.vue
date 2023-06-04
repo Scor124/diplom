@@ -14,7 +14,7 @@ export default {
     },
     mounted() {
         axios.get('/teachers')
-            .then((response) => this.teachers = response.data)
+            .then((response) => {this.teachers = response.data;})
             .catch(error => {console.log(error.response.data.message)});
     },
     beforeDestroy() {
@@ -28,11 +28,7 @@ export default {
             }
         },
         updateTeacher(teacher) {
-            axios.put(`/teachers/update/${teacher.id}/`, {
-
-            },{
-
-            })
+            axios.put(`/teachers/update/${teacher.id}/`)
                 .then(response => {console.log(response.data.message)})
                 .catch(error => {console.log(error.response.data.message)})
         },
@@ -49,9 +45,9 @@ export default {
             if (!this.searchQuery) {
                 return this.teachers
             }
-            return this.teachers.filter(user =>
-                user.teachers.toLowerCase().includes(this.searchQuery.toLowerCase())
-                || user.email.toLowerCase().includes(this.searchQuery.toLowerCase())
+            return this.teachers.filter(teachers =>
+                teachers.user.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+                || teachers.user.email.toLowerCase().includes(this.searchQuery.toLowerCase())
             )
         }
     },
@@ -65,9 +61,7 @@ export default {
                 <div class="float-end">
                     <button class="btn btn-close hover:bg-red-700" @click="showModal = false"></button>
                 </div>
-                <TeacherAddPage @close="axios.get('/teachers')
-                            .then((response) => this.teachers = response.data)
-                            .catch(error => {console.log(error.response.data.message)});"/>
+                <TeacherAddPage/>
             </div>
         </div>
         <div class="py-12">
@@ -87,18 +81,18 @@ export default {
                             <tr>
                                 <th class="text-center">Ф.И.О.</th>
                                 <th class="text-center">E-mail</th>
-                                <th class="text-center">Подтвержден</th>
-                                <th class="text-center">Учитель</th>
+                                <th class="text-center">Специализация</th>
                                 <th class="text-center">Действия</th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr v-for="teachers in filteredUsers" :key="teachers.id" class="row-auto align-content-center">
-                                <td class="px-3 align-middle">{{ teachers.name }}</td>
-                                <td class="px-3 align-middle">{{ teachers.email }}</td>
-                                <td class="text-center align-middle"><input type="checkbox" v-model="teachers.is_verified" @change="updateTeacher(teachers)"></td>
-                                <td class="text-center align-middle"><input type="checkbox" v-model="teachers.is_teacher" @change="updateTeacher(teachers)"></td>
-                                <td class="px-10 align-middle"><button class="btn btn-outline-danger hover:text-red-500 border-red-700" @click="deleteTeacher(teachers)">Удалить</button></td>
+                                <td class="px-3 align-middle">{{ teachers.user.name }}</td>
+                                <td class="px-3 align-middle">{{ teachers.user.email }}</td>
+                                <td class="px-3 align-middle">{{ teachers.Qualification }}</td>
+                                <td class="px-10 align-middle">
+                                    <button class="btn btn-outline-danger hover:text-red-500 border-red-700" @click="deleteTeacher(teachers)">Удалить</button>
+                                </td>
                             </tr>
                             </tbody>
                         </table>

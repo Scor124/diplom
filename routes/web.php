@@ -24,18 +24,17 @@ Route::get('/about',function (){
 })->name('about');
 
 Route::middleware('auth')->group(function () {
-    //Route::middleware('is-verified')->group(function (){
-        Route::get('/dashboard', function () {
-            return Inertia::render('Dashboard',[
-                'id' => Auth::user()->id,
-                'isTeacher' => Auth::user()->is_teacher,
-                'isVerified' => Auth::user()->is_verified
-            ]);
-        })->name('dashboard');
-        Route::get('/marks',function (){
-            return Inertia::render('MarksPage');
-        })->name('marks');
-    //});
+    Route::get('/dashboard', function () {
+        return Inertia::render('Dashboard',[
+            'id' => Auth::user()->id,
+            'isTeacher' => Auth::user()->is_teacher,
+            'isVerified' => Auth::user()->is_verified
+        ]);
+    })->name('dashboard');
+
+    Route::get('/marks',function (){
+        return Inertia::render('MarksPage');
+    })->name('marks');
     // Страница ученика
     Route::get('/mymarks',function (){
         return Inertia::render('MyMarks');
@@ -52,19 +51,30 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/students',function (){
             return Inertia::render('Admin/StudentsPage');
         })->name('admin.students');
+
+        Route::get('/admin/teachers',function (){
+            return Inertia::render('Admin/TeachersPage');
+        })->name('admin.teachers');
+
         Route::get('/admin/users',function (){
             return Inertia::render('Admin/UsersPage');
         })->name('admin.users');
+
         Route::get('/admin/classes',function (){
             return Inertia::render('Admin/ClassesPage');
         })->name('admin.classes');
-        Route::get('/admin/classes/add',function (){
-            return Inertia::render('Admin/ClassAddPage');
-        })->name('admin.classes.add');
+
+        Route::get('/admin/classes/{id}/subjects',function ($id){
+            if ($id!=null){
+                return Inertia::render('Admin/SubjectsForClass',['groupId' => $id]);
+            }
+            else return response()->json(['message' => 'Выберите класс']);
+        })->name('class.subjects');
 
         //
         Route::get('/students',[APIDataController::class,'getStudents']);
         Route::get('/student/{id}',[APIDataController::class,'getStudent']);
+        Route::get('/student/{id}/marks');
         Route::put('/student/update/{id}',[APIDataController::class,'updateStudent']);
         Route::post('/student/create',[APIDataController::class,'createStudent']);
         Route::delete('/student/delete/{id}',[APIDataController::class,'deleteStudent']);
@@ -85,7 +95,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/classes/{id}', [APIDataController::class, 'getClass']);
         Route::post('/classes/create', [APIDataController::class,'createClass']);
         Route::delete('/classes/delete/{id}', [APIDataController::class, 'deleteClass']);
+
         Route::get('/classes/{id}/students', [APIDataController::class, 'getStudentsByGroupId']);
+        Route::post('/classes/{id}/students/marks', [APIDataController::class]);
+        Route::get('/classes/{id}/subjects', [APIDataController::class, 'getSubjectsOfGroup']);
+
+        //Route::post('/subject/create', [APIDataController::class]); //4242
+
+
     });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

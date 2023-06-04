@@ -51,7 +51,6 @@ return new class extends Migration
                 ->references('id')->on('classes');
         });
 
-
         Schema::create('subjects', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');

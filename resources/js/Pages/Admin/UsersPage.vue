@@ -86,8 +86,8 @@ export default {
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8" >
                 <div class="container-fluid">
                     <div class="col-auto">
-                        <div class="btn btn-outline-success hover:bg-green-500 rounded-5 float-start">
-                            <button @click="showModal = true">Добавить пользователя</button>
+                        <div class="btn btn-outline-success hover:bg-green-500 rounded-5 float-start" disabled>
+                            <button @click="showModal = true" disabled>Добавить пользователя</button>
                         </div>
                         <div class="float-end w-2/5">
                             <input class="w-full rounded-pill" type="search"  placeholder="Поиск по Ф.И.О. и e-mail" v-model="searchQuery">
@@ -99,7 +99,6 @@ export default {
                                 <tr>
                                     <th class="text-center">Ф.И.О.</th>
                                     <th class="text-center">E-mail</th>
-                                    <th class="text-center">Подтвержден</th>
                                     <th class="text-center">Учитель</th>
                                     <th class="text-center">Действия</th>
                                 </tr>
@@ -108,9 +107,8 @@ export default {
                                 <tr v-for="user in filteredUsers" :key="user.id" class="row-auto align-content-center">
                                     <td class="px-3 align-middle">{{ user.name }}</td>
                                     <td class="px-3 align-middle">{{ user.email }}</td>
-                                    <td class="text-center align-middle"><input type="checkbox" v-model="user.is_verified" @change="updateUser(user)"></td>
-                                    <td class="text-center align-middle"><input type="checkbox" v-model="user.is_teacher" @change="updateUser(user)"></td>
-                                    <td class="px-10 align-middle"><button class="btn btn-outline-danger hover:text-red-500 border-red-700" @click="deleteUser(user)">Удалить</button></td>
+                                    <td class="text-center align-middle"><input type="checkbox" v-model="user.is_teacher" @change="updateUser(user)" disabled></td>
+                                    <td class="px-10 align-middle"><button class="btn btn-outline-danger hover:text-red-500 border-red-700" @click="deleteUser(user)" disabled>Удалить</button></td>
                                 </tr>
                             </tbody>
                         </table>

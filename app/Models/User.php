@@ -44,5 +44,9 @@ class User extends Authenticatable
         'is_teacher' => 'bool',
         'is_verified' => 'bool',
     ];
+    public function teacher()
+    {
+        return $this->hasOne(Teacher::class);
+    }
     public $timestamps = true;
 }

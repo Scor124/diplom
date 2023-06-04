@@ -57,16 +57,19 @@ export default {
         deleteUser(student){
             if(confirm(`Вы точно хотите удалить ${student.name}?`)){
                 let UserID = student.UserID;
-                axios.delete(`/students/delete/${student.id}`)
-                    .then(this.groupChanged())
+                axios.delete(`/student/delete/${student.id}`)
+                    .then(this.groupChanged)
                     .catch(error => {
                         console.log(error);
                     });
+                /*
                 axios.delete(`/users/delete/${UserID}`)
                     .then(this.groupChanged())
                     .catch(error => {
                         console.log(error);
                     });
+                 */
+
             }
         }        // Удалить пользователя (опционально)
     },
@@ -118,7 +121,7 @@ export default {
                                 <div class="m-4" id="group-selection">
                                     <label for="group-select">Выбрать группу:</label>
                                     <select class="form-select rounded-5" v-model="selectedGroup" @change="groupChanged">
-                                        <option disabled value="">Выберите группу</option>
+                                        <option disabled value="0">Выберите группу</option>
                                         <option v-for="group in filtredGroups" :key="group.id" :value="group.id">{{ group.name }}</option>
                                     </select>
                                 </div>
@@ -136,7 +139,7 @@ export default {
                                         <tr>
                                             <th>Ф.И.О. студентов</th>
                                             <th>E-mail</th>
-                                            <th>Действия</th>
+                                            <th class="text-center">Действия</th>
                                             <th>
                                                 <div v-if="selectedGroup!==0" class="btn btn-outline-success hover:bg-green-500 rounded-5 float-start">
                                                     <button @click="showModal = true" >Добавить студента</button>
