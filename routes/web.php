@@ -98,9 +98,9 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/classes/{id}/students', [APIDataController::class, 'getStudentsByGroupId']);
         Route::post('/classes/{id}/students/marks', [APIDataController::class, 'getAllMarksOfGroup']);
-
         Route::get('/classes/{id}/subjects', [APIDataController::class, 'getSubjectsOfGroup']);
 
+        Route::post('/marks/create', [APIDataController::class,'']);
         //Route::post('/subject/create', [APIDataController::class]); //4242
 
 

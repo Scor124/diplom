@@ -74,6 +74,7 @@ export default {
     methods: {
         getMark(studentId, day) {
             const subjectID = this.selectedSubject;
+            const mrk = this.marks.find()
             const mark = this.marks.find(m =>
                 m.student_id === studentId &&
                 m.case_id === subjectID &&
@@ -187,7 +188,7 @@ export default {
                                                 <td>{{ student.name }}</td>
                                                 <td v-for="day in daysInMonth">
                                                     <!-- v-model="getMark(student.id, this.selectedSubject, day)" -->
-                                                    <select  @change="saveMark(student.id,day)">
+                                                    <select v-model="student.marks" @change="saveMark(student.id,day)" class="text-black">
                                                         <option value="-">-</option>
                                                         <option value="Н">Н</option>
                                                         <option value="Б">Б</option>
@@ -201,7 +202,6 @@ export default {
                                         </tbody>
                                     </table>
                                 </div>
-
                             </div>
                         </div>
                     </div>

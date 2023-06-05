@@ -304,7 +304,12 @@ class APIDataController extends Controller
         $subjectID = $request->input('subject_id');
         $date = $request->input('date');
         return response()->json(Marks::where('case_id', '=', $subjectID)
+            ->join('students','students.id','=','marks.student_id')
             ->get());
+    }
+    public function markAddOrUpdate(Request $request){
+
+        return;
     }
 }
 
