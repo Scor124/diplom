@@ -21,7 +21,5 @@ class Classes extends Model
     protected $casts = [
         'formation_date' => 'datetime:Y-m-d',
     ];
-
-
     public $timestamps = false;
 }

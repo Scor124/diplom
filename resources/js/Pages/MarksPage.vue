@@ -1,12 +1,9 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import {Head,Link} from "@inertiajs/vue3";
-import Dropdown from "@/Components/Dropdown.vue";
-import DropdownLink from "@/Components/DropdownLink.vue";
 </script>
 
 <script>
-import {usePage} from "@inertiajs/vue3";
 import axios from "axios";
 const months = [
     { id: 1, name: 'Январь' },
@@ -44,7 +41,9 @@ export default {
     },
     computed: {
         daysInMonth() {
-            const daysInMonth = new Date(this.selectedYear, this.selectedMonth, 0).getDate();
+            const year = this.selectedYear;
+            const month = this.selectedMonth;
+            const daysInMonth = new Date(year,month,0).getDate();
             const daysArray = [];
             for (let i = 1; i <= daysInMonth; i++) {
                 daysArray.push(i);
@@ -53,9 +52,9 @@ export default {
         },
         filtredGroups() {
             if (this.searchClass === ''){
-                return this.classes
+                return this.classes;
             }
-            return this.classes.filter(classes => classes.name.toLowerCase().includes(this.searchClass.toLowerCase()))
+            return this.classes.filter(c => c.name.toLowerCase().includes(this.searchClass.toLowerCase()));
         },
         filtredSubjects(){
             if (this.searchSubject === ''){
@@ -73,23 +72,44 @@ export default {
             .catch(error => console.log(error.message))
     },
     methods: {
-        getAttendance(attendance, day) {
+        getMark(studentId, day) {
+            const subjectID = this.selectedSubject;
+            const mark = this.marks.find(m =>
+                m.student_id === studentId &&
+                m.case_id === subjectID &&
+                new Date(m.date).getDate() === new Date(this.selectedYear, this.selectedMonth, day).getDate()
+            );
+            return mark ? mark.mark : '-';
+        },
+        saveMark(studentId, day){
+            const subjectID = this.selectedSubject;
+            axios.post(``,{
 
-            const attendanceObject = attendance.find(a => new Date(a.date).getDate() === day);
-            return attendanceObject ? attendanceObject.status : "-";
+            })
+                .then(r => console.log(r.data))
+                .catch()
+            return;
         },
         showSubjects(classId){
             this.selectedSubject = null;
             this.selectedClass = classId;
+            axios.get(`/classes/${classId}/students`).then(response =>{
+                this.students = response.data
+                console.log(response);
+            }).catch()
             axios.get(`/classes/${classId}/subjects`).then(response =>{
                 this.subjects = response.data
             }).catch()
         },
-        subjectChanged(classId){
-            axios.get(`/classes/${classId}/students`).then(response =>{
-                this.students = response.data
-            }).catch()
-
+        subjectChanged(subjectID){
+            axios.get(`/student/marks`,{
+                params:{
+                    subjectID: this.selectedSubject,
+                }
+            }).then(response =>{
+                this.marks = response.data;
+                console.log(response);
+            }).catch(error=>console.log(error.message))
         },
         resetDates(){
             this.selectedMonth = right_now.getMonth();
@@ -111,7 +131,7 @@ export default {
                             <div class="col-3 p-3 rounded-1 border-white border-2 w-1/5">
                                 <h5 class="text-center w-full text-white mb-2">Список классов</h5>
                                 <input type="search" v-model="searchClass" class="h-7 w-full px-2 mb-4" placeholder="Введите название класса">
-                                <div class="scrollable">
+                                <div class="scrollable-y">
                                     <table class="text-gray-50 table">
                                         <thead>
                                             <tr>
@@ -120,7 +140,7 @@ export default {
                                         </thead>
                                         <tbody>
                                             <tr v-for="cls in filtredGroups" :key="cls.id">
-                                                <td class="w-full justify-center">
+                                                <td>
                                                     <button class="btn-link w-full" @click="showSubjects(cls.id)">{{ cls.name }}</button>
                                                 </td>
                                             </tr>
@@ -153,10 +173,9 @@ export default {
                                         <option v-for="year in ['2019','2020','2021','2022','2023']" :value="year" >{{ year }}</option>
                                     </select>
                                     <button class="btn btn-outline-danger mx-auto" @click="resetDates">Сбросить</button>
-
                                 </div>
                                 <div class="scrollable-x table-responsive">
-                                    <table class="table table-striped-columns table-striped text-white">
+                                    <table class="table table-striped-columns text-white">
                                         <thead>
                                             <tr>
                                                 <th>Студент</th>
@@ -165,8 +184,19 @@ export default {
                                         </thead>
                                         <tbody>
                                             <tr v-for="student in students" :key="student.id">
-                                                <td>{{student.name}}</td>
-                                                <td v-for="(day, index) in daysInMonth" :key="index">{{ getAttendance(student.marks, day) }}</td>
+                                                <td>{{ student.name }}</td>
+                                                <td v-for="day in daysInMonth">
+                                                    <!-- v-model="getMark(student.id, this.selectedSubject, day)" -->
+                                                    <select  @change="saveMark(student.id,day)">
+                                                        <option value="-">-</option>
+                                                        <option value="Н">Н</option>
+                                                        <option value="Б">Б</option>
+                                                        <option value="2">2</option>
+                                                        <option value="3">3</option>
+                                                        <option value="4">4</option>
+                                                        <option value="5">5</option>
+                                                    </select>
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>

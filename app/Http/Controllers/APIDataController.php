@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Classes;
+use App\Models\Marks;
 use App\Models\Student;
 use App\Models\Subjects;
 use App\Models\Teacher;
@@ -287,8 +288,23 @@ class APIDataController extends Controller
         $subjects = Subjects::with('teacher.user')->where('classID','=',$groupId)->get();
         return response()->json($subjects);
     }
-    public function getStudentMarks($studentID){
-        return;
+    public function getAllMarksOfGroup(Request $request){
+        $groupID = $request->input('groupID');
+        $subjectID = $request->input('subjectID');
+        $answ = Marks::
+            join('students','students.id','=','marks.student_id')
+            ->join('subjects','subjects.id','=','marks.case_id')
+            ->where('students.class_id','=',$groupID)
+            ->where('subjects.classID','=',)->get();
+        return $answ;
+    }
+
+    public function getStudentMarksFromCurrentSubject(Request $request)
+    {
+        $subjectID = $request->input('subject_id');
+        $date = $request->input('date');
+        return response()->json(Marks::where('case_id', '=', $subjectID)
+            ->get());
     }
 }
 

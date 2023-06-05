@@ -18,5 +18,17 @@ class Student extends Model
 
     protected $table = 'students';
     public $timestamps = false;
-    protected $fillable = ['UserID', 'class_id'];
+    protected $fillable = [
+        'UserID',
+        'class_id',
+    ];
+    public function user(){
+        return $this->belongsTo(User::class,'UserID','id');
+    }
+    public function classes(){
+        return $this->belongsTo(Classes::class,'class_id','id');
+    }
+    public function marks(){
+        return $this->hasMany(Marks::class,'student_id','id');
+    }
 }
