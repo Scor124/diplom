@@ -68,7 +68,7 @@ return new class extends Migration
             $table->increments('id');
             $table->integer('case_id');
             $table->integer('student_id');
-            $table->dateTime('date');
+            $table->date('date');
             $table->char('mark');
             $table->foreign('case_id')
                 ->references('id')->on('subjects');

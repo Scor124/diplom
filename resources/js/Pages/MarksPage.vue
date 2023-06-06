@@ -73,23 +73,24 @@ export default {
     },
     methods: {
         getMark(studentId, day) {
-            const subjectID = this.selectedSubject;
-            const mrk = this.marks.find()
-            const mark = this.marks.find(m =>
-                m.student_id === studentId &&
-                m.case_id === subjectID &&
-                new Date(m.date).getDate() === new Date(this.selectedYear, this.selectedMonth, day).getDate()
-            );
+            const mark = this.marks.find(item => {
+                const month = this.selectedMonth<10 ? `0${this.selectedMonth}` : this.selectedMonth;
+                const year = this.selectedYear.toString();
+                return item.student_id === studentId &&  item.date.toString() == new Date(year, this.selectedMonth - 1, day).toISOString().slice(0, 10);
+            });
             return mark ? mark.mark : '-';
         },
-        saveMark(studentId, day){
+        saveMark(studentId, day, event){
+            console.log(event.target.value);
             const subjectID = this.selectedSubject;
-            axios.post(``,{
-
-            })
-                .then(r => console.log(r.data))
-                .catch()
-            return;
+            axios.post('/marks/create',{
+                case_id: subjectID,
+                student_id: studentId,
+                day: day,
+                month: this.selectedMonth,
+                year: this.selectedYear,
+                mark: event.target.value
+            }).then(r=>console.log(r)).catch(err=>console.log(err.message));
         },
         showSubjects(classId){
             this.selectedSubject = null;
@@ -102,14 +103,14 @@ export default {
                 this.subjects = response.data
             }).catch()
         },
-        subjectChanged(subjectID){
-            axios.get(`/student/marks`,{
-                params:{
-                    subjectID: this.selectedSubject,
-                }
+        subjectChanged(){
+            let subjectID = this.selectedSubject;
+            console.log(subjectID);
+            axios.get('/subject/marks',{
+                params:{subject_id: this.selectedSubject}
             }).then(response =>{
-                this.marks = response.data;
                 console.log(response);
+                this.marks = response.data;
             }).catch(error=>console.log(error.message))
         },
         resetDates(){
@@ -154,8 +155,8 @@ export default {
                                 <h5 class="text-center w-full text-white mb-2">Список предметов</h5>
                                 <input type="search" v-model="searchSubject" class="h-7 w-full px-2 mb-3" placeholder="Введите название предмета">
                                 <div class="w-full p-4 justify-center">
-                                    <select class="form-select rounded-5" v-model="selectedSubject">
-                                        <option v-for="subject in filtredSubjects" :key="subject.id" :value="subject.id" @select="subjectChanged(subject.id)">
+                                    <select class="form-select rounded-5" v-model="selectedSubject" @change="subjectChanged">
+                                        <option v-for="subject in filtredSubjects" :key="subject.id" :value="subject.id" >
                                             {{ subject.name }}
                                         </option>
                                     </select>
@@ -187,8 +188,7 @@ export default {
                                             <tr v-for="student in students" :key="student.id">
                                                 <td>{{ student.name }}</td>
                                                 <td v-for="day in daysInMonth">
-                                                    <!-- v-model="getMark(student.id, this.selectedSubject, day)" -->
-                                                    <select v-model="student.marks" @change="saveMark(student.id,day)" class="text-black">
+                                                    <select v-on:change="saveMark(student.student.id, day, $event)" :value="getMark(student.student.id, day)" class="text-black">
                                                         <option value="-">-</option>
                                                         <option value="Н">Н</option>
                                                         <option value="Б">Б</option>

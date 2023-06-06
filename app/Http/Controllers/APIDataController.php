@@ -281,35 +281,41 @@ class APIDataController extends Controller
         foreach ($students as $student) {
             $userIds[] = $student->UserID;
         }
-        $users = User::whereIn('id', $userIds)->get();
+        $users = User::whereIn('id', $userIds)->with('student')->get();
         return $users;
     }
     public function getSubjectsOfGroup($groupId){
         $subjects = Subjects::with('teacher.user')->where('classID','=',$groupId)->get();
         return response()->json($subjects);
     }
-    public function getAllMarksOfGroup(Request $request){
-        $groupID = $request->input('groupID');
-        $subjectID = $request->input('subjectID');
-        $answ = Marks::
-            join('students','students.id','=','marks.student_id')
-            ->join('subjects','subjects.id','=','marks.case_id')
-            ->where('students.class_id','=',$groupID)
-            ->where('subjects.classID','=',)->get();
-        return $answ;
-    }
 
-    public function getStudentMarksFromCurrentSubject(Request $request)
+    public function getMarksFromCurrentSubject(Request $request)
     {
         $subjectID = $request->input('subject_id');
-        $date = $request->input('date');
-        return response()->json(Marks::where('case_id', '=', $subjectID)
-            ->join('students','students.id','=','marks.student_id')
-            ->get());
+        //return response()->json(Marks::where('case_id', '=', $subjectID)->get());
+        return response()->json(Marks::where('case_id', '=', $subjectID)->get());
     }
     public function markAddOrUpdate(Request $request){
-
-        return;
+        $month = $request->input('month');
+        $day = $request->input('day');
+        $year = $request->input('year');
+        $date = mktime(0,0,0,$month, $day, $year);
+        $mark = Marks::where('case_id', $request->input('case_id'))
+            ->where('student_id', $request->input('student_id'))
+            ->where('date', date('Y-m-d', $date))->first();
+        echo $mark;
+        if ($mark){
+            $mark->mark = $request->input('mark');
+            $mark->save();
+            return response()->json(['message' => "Оценка изменена"]);
+        };
+        $mark = new Marks;
+        $mark->case_id = $request->input('case_id');
+        $mark->student_id = $request->input('student_id');
+        $mark->date = date('Y-m-d', $date);
+        $mark->mark = $request->input('mark');
+        $mark->save();
+        return response()->json(['message'=>'Оценка поствлена']);
     }
 }
 

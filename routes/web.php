@@ -74,7 +74,6 @@ Route::middleware('auth')->group(function () {
         //
         Route::get('/students',[APIDataController::class,'getStudents']);
         Route::get('/student/{id}',[APIDataController::class,'getStudent']);
-        Route::get('/student/marks', [APIDataController::class, 'getStudentMarksFromCurrentSubject']);
         Route::put('/student/update/{id}',[APIDataController::class,'updateStudent']);
         Route::post('/student/create',[APIDataController::class,'createStudent']);
         Route::delete('/student/delete/{id}',[APIDataController::class,'deleteStudent']);
@@ -97,11 +96,13 @@ Route::middleware('auth')->group(function () {
         Route::delete('/classes/delete/{id}', [APIDataController::class, 'deleteClass']);
 
         Route::get('/classes/{id}/students', [APIDataController::class, 'getStudentsByGroupId']);
-        Route::post('/classes/{id}/students/marks', [APIDataController::class, 'getAllMarksOfGroup']);
+
         Route::get('/classes/{id}/subjects', [APIDataController::class, 'getSubjectsOfGroup']);
 
-        Route::post('/marks/create', [APIDataController::class,'']);
-        //Route::post('/subject/create', [APIDataController::class]); //4242
+        Route::get('/subject/marks', [APIDataController::class, 'getMarksFromCurrentSubject']);
+
+        Route::post('/marks/create', [APIDataController::class,'markAddOrUpdate']);
+
 
 
     });
