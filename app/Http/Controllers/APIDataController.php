@@ -11,6 +11,7 @@ use App\Models\User;
 use Date;
 use DB;
 use Hash;
+use http\Env\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Inertia\Testing\Concerns\Has;
@@ -316,6 +317,21 @@ class APIDataController extends Controller
         $mark->mark = $request->input('mark');
         $mark->save();
         return response()->json(['message'=>'Оценка поствлена']);
+    }
+    public function getMark(Request $request){
+        $studentID = $request->input('student_id');
+        $caseID = $request->input('case_id');
+        $date = $request->input('date');
+        $answer = Marks::where('case_id','=',$caseID)
+            ->where('student_id', '=', $studentID)
+            ->where('date', '=', $date)
+            ->first('mark');
+        if ($answer==null){
+            return response()->json(['mark'=> '-']);
+        }
+        return response()->json(
+            $answer
+        );
     }
 }
 

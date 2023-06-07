@@ -102,7 +102,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/subject/marks', [APIDataController::class, 'getMarksFromCurrentSubject']);
 
         Route::post('/marks/create', [APIDataController::class,'markAddOrUpdate']);
-
+        Route::get('/markses', [APIDataController::class,'getMark']);
 
 
     });

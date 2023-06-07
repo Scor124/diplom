@@ -1,10 +1,12 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import {Head,Link} from "@inertiajs/vue3";
+import StudentForMarksSelector from "@/Components/StudentForMarksSelector.vue";
 </script>
 
 <script>
 import axios from "axios";
+import StudentForMarksSelector from "@/Components/StudentForMarksSelector.vue";
 const months = [
     { id: 1, name: 'Январь' },
     { id: 2, name: 'Февраль' },
@@ -32,11 +34,12 @@ export default {
             searchClass: '',
             searchSubject: '',
 
-            selectedClass: null,
-            selectedSubject: null,
+            selectedClass: 0,
+            selectedSubject: 0,
 
             selectedMonth: right_now.getMonth(),
             selectedYear: right_now.getFullYear(),
+
         }
     },
     computed: {
@@ -61,58 +64,32 @@ export default {
                 return this.subjects
             }
             return this.subjects.filter(subject => subject.name.toLowerCase().includes(this.searchSubject.toLowerCase()))
-        }
+        },
+        getDateInYMD(day){
+            let $ast = new Date(this.selectedYear, this.selectedMonth - 1, day+1).toISOString().slice(0, 10).toString()
+            return $ast;
+        },
     },
     mounted() {
         axios.get('/classes')
             .then(response => {
                 this.classes = response.data;
-                console.log(response);
             })
             .catch(error => console.log(error.message))
     },
     methods: {
-        getMark(studentId, day) {
-            const mark = this.marks.find(item => {
-                const month = this.selectedMonth<10 ? `0${this.selectedMonth}` : this.selectedMonth;
-                const year = this.selectedYear.toString();
-                return item.student_id === studentId &&  item.date.toString() == new Date(year, this.selectedMonth - 1, day).toISOString().slice(0, 10);
-            });
-            return mark ? mark.mark : '-';
-        },
-        saveMark(studentId, day, event){
-            console.log(event.target.value);
-            const subjectID = this.selectedSubject;
-            axios.post('/marks/create',{
-                case_id: subjectID,
-                student_id: studentId,
-                day: day,
-                month: this.selectedMonth,
-                year: this.selectedYear,
-                mark: event.target.value
-            }).then(r=>console.log(r)).catch(err=>console.log(err.message));
-        },
+
         showSubjects(classId){
             this.selectedSubject = null;
             this.selectedClass = classId;
             axios.get(`/classes/${classId}/students`).then(response =>{
                 this.students = response.data
-                console.log(response);
             }).catch()
             axios.get(`/classes/${classId}/subjects`).then(response =>{
                 this.subjects = response.data
             }).catch()
         },
-        subjectChanged(){
-            let subjectID = this.selectedSubject;
-            console.log(subjectID);
-            axios.get('/subject/marks',{
-                params:{subject_id: this.selectedSubject}
-            }).then(response =>{
-                console.log(response);
-                this.marks = response.data;
-            }).catch(error=>console.log(error.message))
-        },
+
         resetDates(){
             this.selectedMonth = right_now.getMonth();
             this.selectedYear = right_now.getFullYear();
@@ -151,7 +128,7 @@ export default {
                                 </div>
                             </div>
                             <!-- Для предметов столбец -->
-                            <div class="col-3 p-3 rounded-1 border-white border-2 w-1/5" v-if="selectedClass!=null">
+                            <div class="col-3 p-3 rounded-1 border-white border-2 w-1/5" v-if="selectedClass!==0">
                                 <h5 class="text-center w-full text-white mb-2">Список предметов</h5>
                                 <input type="search" v-model="searchSubject" class="h-7 w-full px-2 mb-3" placeholder="Введите название предмета">
                                 <div class="w-full p-4 justify-center">
@@ -163,11 +140,11 @@ export default {
                                 </div>
                             </div>
                             <!-- Для оценок столбец -->
-                            <div class="col-6 p-3 rounded-1 border-white border-2 w-3/5" v-if="selectedClass!=null && selectedSubject!=null">
+                            <div class="col-6 p-3 rounded-1 border-white border-2 w-3/5" v-if="selectedClass!==0 && selectedSubject!==0">
                                 <h5 class="text-center w-full text-white mb-2">Оценки</h5>
                                 <div class="h-10 w-full px-2 mb-2 d-flex justify-content-between">
                                     <h1 class="text-white mx-auto">Выберите месяц</h1>
-                                    <select class="form-select rounded-5 mx-auto" v-model="selectedMonth">
+                                    <select class="form-select rounded-5 mx-auto" v-model="selectedMonth" @change="">
                                         <option v-for="month in months" :value="month.id" >{{ month.name }}</option>
                                     </select>
                                     <h1 class="text-white mx-auto">Выберите год</h1>
@@ -177,27 +154,25 @@ export default {
                                     <button class="btn btn-outline-danger mx-auto" @click="resetDates">Сбросить</button>
                                 </div>
                                 <div class="scrollable-x table-responsive">
-                                    <table class="table table-striped-columns text-white">
+                                    <table class="table table-striped-columns text-white" id="table">
                                         <thead>
                                             <tr>
                                                 <th>Студент</th>
                                                 <th v-for="(day, index) in daysInMonth" :key="index">{{ day }}</th>
+                                                <th></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr v-for="student in students" :key="student.id">
                                                 <td>{{ student.name }}</td>
                                                 <td v-for="day in daysInMonth">
-                                                    <select v-on:change="saveMark(student.student.id, day, $event)" :value="getMark(student.student.id, day)" class="text-black">
-                                                        <option value="-">-</option>
-                                                        <option value="Н">Н</option>
-                                                        <option value="Б">Б</option>
-                                                        <option value="2">2</option>
-                                                        <option value="3">3</option>
-                                                        <option value="4">4</option>
-                                                        <option value="5">5</option>
-                                                    </select>
+                                                    <StudentForMarksSelector
+                                                        :student_id="student.student.id"
+                                                        :case_id="selectedSubject"
+                                                        :date="this.getDateInYMD(day)"
+                                                    />
                                                 </td>
+                                                <td></td>
                                             </tr>
                                         </tbody>
                                     </table>
