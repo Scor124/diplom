@@ -14,15 +14,10 @@ export default {
             Mark: null,
         }
     },
-
     mounted() {
-        console.log(this.student_id);
-        console.log(this.case_id);
-        console.log(this.date);
         this.getMark();
     },
     computed(){
-
     },
     methods: {
         getMark(){
@@ -33,12 +28,10 @@ export default {
                     date: this.date,
                 }
             }).then(r=> {
-                console.log(r);
                 this.Mark = r.data.mark;
             }).catch(e=>console.log(e.message))
         },
         saveMark(event){
-            console.log(event.target.value);
             axios.post('/marks/create',{
                 case_id: this.case_id,
                 student_id: this.student_id,

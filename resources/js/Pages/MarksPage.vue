@@ -7,6 +7,7 @@ import StudentForMarksSelector from "@/Components/StudentForMarksSelector.vue";
 <script>
 import axios from "axios";
 import StudentForMarksSelector from "@/Components/StudentForMarksSelector.vue";
+import * as XLSX from "xlsx";
 const months = [
     { id: 1, name: 'Январь' },
     { id: 2, name: 'Февраль' },
@@ -22,14 +23,14 @@ const months = [
     { id: 12, name: 'Декабрь' }
 ];
 const right_now = new Date();
-right_now.setMonth(right_now.getMonth()+1);
 export default {
     data() {
         return {
             classes: [],
             subjects: [],
             students: [],
-            marks: [],
+            marks: {},
+            selectedMark:{},
 
             searchClass: '',
             searchSubject: '',
@@ -37,21 +38,19 @@ export default {
             selectedClass: 0,
             selectedSubject: 0,
 
-            selectedMonth: right_now.getMonth(),
+            selectedMonth: right_now.getMonth() + 1,
             selectedYear: right_now.getFullYear(),
 
+            possibleMarks: ["-","Б", "Н", "2", "3", "4", "5"],
         }
     },
     computed: {
+
         daysInMonth() {
             const year = this.selectedYear;
             const month = this.selectedMonth;
-            const daysInMonth = new Date(year,month,0).getDate();
-            const daysArray = [];
-            for (let i = 1; i <= daysInMonth; i++) {
-                daysArray.push(i);
-            }
-            return daysArray;
+            const days = new Date(year, month + 1, 0).getDate();
+            return Array.from({ length: days }, (v, k) => k + 1);
         },
         filtredGroups() {
             if (this.searchClass === ''){
@@ -65,10 +64,6 @@ export default {
             }
             return this.subjects.filter(subject => subject.name.toLowerCase().includes(this.searchSubject.toLowerCase()))
         },
-        getDateInYMD(day){
-            let $ast = new Date(this.selectedYear, this.selectedMonth - 1, day+1).toISOString().slice(0, 10).toString()
-            return $ast;
-        },
     },
     mounted() {
         axios.get('/classes')
@@ -78,9 +73,69 @@ export default {
             .catch(error => console.log(error.message))
     },
     methods: {
-
+        totalPass(row) {
+            console.log(row);
+            let totalPasses = 0;
+            for (let u = 1; u <= this.daysInMonth; u++ ) {
+                const mark = row[u];
+                if (mark == 'Н' || mark == 'Б') { // учитываем только пропуски
+                    totalPasses ++;
+                }
+            }
+            return totalPasses;
+        },
+        averageMarks(row) {
+            // Обработать вход массива
+            console.log(row.date);
+            let totalMarks = 0;
+            let count = 0;
+            for (let u = 1; u <= this.daysInMonth; u++ ) {
+                const mark = row[u];
+                if (mark >= '2' && mark <= '5') { // учитываем только оценки 2, 3, 4 и 5
+                    totalMarks += mark;
+                    count++;
+                }
+            }
+            return count > 0 ? (totalMarks / count).toFixed(2) : 0; // округляем до двух знаков после запятой
+        },
+        exportToExcel() {
+            //table
+            const table = document.getElementById('table');
+            const rows = Array.from(table.querySelectorAll('tr'));
+            const headers = Array.from(rows.shift().querySelectorAll('th')).map(header => header.innerText);
+            const data = rows.map(row => {
+                const rowData = {};
+                Array.from(row.querySelectorAll('td')).forEach((cell, index) => {
+                    rowData[headers[index]] = cell.innerText;
+                });
+                return rowData;
+            });
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.json_to_sheet(data);
+            XLSX.utils.book_append_sheet(workbook, worksheet, `Оценки_${new Date().toDateString()}`);
+            XLSX.writeFile(workbook, `Оценки_${months[this.selectedMonth].name}_${new Date().toDateString()}.xlsx`);
+        },
+        updateTable(){
+            this.marks = {};
+            this.students = [];
+            axios.post('/marksBySubject',{
+                'subject_id': this.selectedSubject,
+                'month': this.selectedMonth,
+                'year': this.selectedYear,
+            }).then(r => {
+                this.marks = r.data.scores;
+            }).catch(e=>console.log(e.message))
+        },
+        saveMark(event,day, studentID){
+            axios.post('/marks/create',{
+                case_id: this.selectedSubject,
+                student_id: studentID,
+                date: this.getDateInYMD(day),
+                mark: event.target.value
+            }).then(r=>console.log(r)).catch(err=>console.log(err.message));
+        },
         showSubjects(classId){
-            this.selectedSubject = null;
+            this.selectedSubject = 0;
             this.selectedClass = classId;
             axios.get(`/classes/${classId}/students`).then(response =>{
                 this.students = response.data
@@ -89,7 +144,10 @@ export default {
                 this.subjects = response.data
             }).catch()
         },
-
+        getDateInYMD(day){
+            let $ast = new Date(this.selectedYear, this.selectedMonth - 1, day+1).toISOString().slice(0, 10);
+            return $ast;
+        },
         resetDates(){
             this.selectedMonth = right_now.getMonth();
             this.selectedYear = right_now.getFullYear();
@@ -132,7 +190,7 @@ export default {
                                 <h5 class="text-center w-full text-white mb-2">Список предметов</h5>
                                 <input type="search" v-model="searchSubject" class="h-7 w-full px-2 mb-3" placeholder="Введите название предмета">
                                 <div class="w-full p-4 justify-center">
-                                    <select class="form-select rounded-5" v-model="selectedSubject" @change="subjectChanged">
+                                    <select class="form-select rounded-5" v-model="selectedSubject" @change="updateTable">
                                         <option v-for="subject in filtredSubjects" :key="subject.id" :value="subject.id" >
                                             {{ subject.name }}
                                         </option>
@@ -144,36 +202,39 @@ export default {
                                 <h5 class="text-center w-full text-white mb-2">Оценки</h5>
                                 <div class="h-10 w-full px-2 mb-2 d-flex justify-content-between">
                                     <h1 class="text-white mx-auto">Выберите месяц</h1>
-                                    <select class="form-select rounded-5 mx-auto" v-model="selectedMonth" @change="">
+                                    <select class="form-select rounded-5 mx-auto" v-model="selectedMonth" @change="updateTable">
                                         <option v-for="month in months" :value="month.id" >{{ month.name }}</option>
                                     </select>
                                     <h1 class="text-white mx-auto">Выберите год</h1>
-                                    <select class="form-select rounded-5 mx-auto" v-model="selectedYear">
+                                    <select class="form-select rounded-5 mx-auto" v-model="selectedYear" @change="updateTable">
                                         <option v-for="year in ['2019','2020','2021','2022','2023']" :value="year" >{{ year }}</option>
                                     </select>
                                     <button class="btn btn-outline-danger mx-auto" @click="resetDates">Сбросить</button>
+                                    <div class="btn btn-outline-success hover:bg-green-500 rounded-5 mx-auto float-end">
+                                        <button @click="exportToExcel">Экспортировать в Excel</button>
+                                    </div>
                                 </div>
                                 <div class="scrollable-x table-responsive">
                                     <table class="table table-striped-columns text-white" id="table">
                                         <thead>
-                                            <tr>
-                                                <th>Студент</th>
-                                                <th v-for="(day, index) in daysInMonth" :key="index">{{ day }}</th>
-                                                <th></th>
-                                            </tr>
+                                        <tr>
+                                            <th>Студент</th>
+                                            <th v-for="(day, index) in daysInMonth" :key="index">{{ day }}</th>
+                                            <th>Средний балл</th>
+                                            <th>Кол-во пропусков</th>
+                                        </tr>
                                         </thead>
                                         <tbody>
-                                            <tr v-for="student in students" :key="student.id">
-                                                <td>{{ student.name }}</td>
-                                                <td v-for="day in daysInMonth">
-                                                    <StudentForMarksSelector
-                                                        :student_id="student.student.id"
-                                                        :case_id="selectedSubject"
-                                                        :date="this.getDateInYMD(day)"
-                                                    />
-                                                </td>
-                                                <td></td>
-                                            </tr>
+                                        <tr v-for="row in marks">
+                                            <td class="text-white">{{ row[0][1] }}</td>
+                                            <td v-for="(day, index) in daysInMonth" :key="index" class="text-black">
+                                                <select v-model="row[index+1]" v-on:change="saveMark($event, day, row[0][0])" class="text-black">
+                                                    <option v-for="ans in possibleMarks">{{ans}}</option>
+                                                </select>
+                                            </td>
+                                            <td>{{ averageMarks(row) }}</td>
+                                            <td>{{ totalPass(row) }}</td>
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>

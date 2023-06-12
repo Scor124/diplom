@@ -36,9 +36,6 @@ defineProps({
                                         <Link class="btn btn-outline-primary mx-2 hover:text-blue-400 text-gray-200" :href="route('admin.classes')" :ref="route('admin.classes')">
                                             Группы
                                         </Link>
-                                        <Link class="btn btn-outline-primary mx-2 hover:text-blue-400 text-gray-200" :href="route('admin.students')" :ref="route('admin.students')">
-                                            Студенты
-                                        </Link>
                                         <Link class="btn btn-outline-primary mx-2 hover:text-blue-400 text-gray-200" :href="route('admin.teachers')" :ref="route('admin.teachers')">
                                             Преподаватели
                                         </Link>

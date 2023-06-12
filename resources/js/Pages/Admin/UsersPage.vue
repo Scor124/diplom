@@ -5,6 +5,7 @@ import axios from "axios";
 </script>
 <script>
 import UserAddPage from "@/Pages/Admin/UserAddPage.vue";
+import * as XLSX from "xlsx";
 export default {
     components:{UserAddPage},
     data() {
@@ -24,6 +25,23 @@ export default {
         document.removeEventListener('keydown', this.handleTabKey);
     },
     methods: {
+        exportToExcel() {
+            //table
+            const table = document.getElementById('table');
+            const rows = Array.from(table.querySelectorAll('tr'));
+            const headers = Array.from(rows.shift().querySelectorAll('th')).map(header => header.innerText);
+            const data = rows.map(row => {
+                const rowData = {};
+                Array.from(row.querySelectorAll('td')).forEach((cell, index) => {
+                    rowData[headers[index]] = cell.innerText;
+                });
+                return rowData;
+            });
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.json_to_sheet(data);
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Пользователи');
+            XLSX.writeFile(workbook, `users_${new Date()}.xlsx`);
+        },
         handleTabKey(event) {
             if (this.showModal && event.key === 'Tab') {
                 event.preventDefault();
@@ -86,15 +104,19 @@ export default {
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8" >
                 <div class="container-fluid">
                     <div class="col-auto">
-                        <div class="btn btn-outline-success hover:bg-green-500 rounded-5 float-start" disabled>
-                            <button @click="showModal = true" disabled>Добавить пользователя</button>
-                        </div>
-                        <div class="float-end w-2/5">
+                        <div class="float-start w-2/5 mx-6">
                             <input class="w-full rounded-pill" type="search"  placeholder="Поиск по Ф.И.О. и e-mail" v-model="searchQuery">
                         </div>
+                        <div class="btn btn-outline-success hover:bg-green-500 rounded-5 float-end mx-6" disabled hidden="hidden">
+                            <button @click="showModal = true" disabled>Добавить пользователя</button>
+                        </div>
+                        <div class="btn btn-outline-success hover:bg-green-500 rounded-5 mx-6 float-end">
+                            <button @click="exportToExcel">Экспортировать в Excel</button>
+                        </div>
+
                     </div>
                     <div class="mt-10 rounded-5 ">
-                        <table class="table mx-auto scroll-m-0.5 overscroll-y-auto table-striped table-bordered mt-4 table-hover bg-gray-300 text-black">
+                        <table id="table" class="table mx-auto scroll-m-0.5 overscroll-y-auto table-striped table-bordered mt-4 table-hover bg-gray-300 text-black">
                             <thead>
                                 <tr>
                                     <th class="text-center">Ф.И.О.</th>

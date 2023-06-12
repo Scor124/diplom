@@ -3,7 +3,11 @@ import axios from "axios";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import TeacherAddPage from "@/Pages/Admin/TeacherAddPage.vue";
 </script>
+
 <script>
+
+import * as XLSX from "xlsx";
+
 export default {
     data() {
         return {
@@ -22,6 +26,24 @@ export default {
         document.removeEventListener('keydown', this.handleTabKey);
     },
     methods: {
+        exportToExcel(){
+            //table
+            const table = document.getElementById('table');
+            const rows = Array.from(table.querySelectorAll('tr'));
+            const headers = Array.from(rows.shift().querySelectorAll('th')).map(header => header.innerText);
+            const data = rows.map(row => {
+                const rowData = {};
+                Array.from(row.querySelectorAll('td')).forEach((cell, index) => {
+                    rowData[headers[index]] = cell.innerText;
+                });
+                return rowData;
+            });
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.json_to_sheet(data);
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
+            XLSX.writeFile(workbook, 'data.xlsx');
+
+        },
         handleTabKey(event) {
             if (this.showModal && event.key === 'Tab') {
                 event.preventDefault();
@@ -33,7 +55,7 @@ export default {
                 .catch(error => {console.log(error.response.data.message)})
         },
         deleteTeacher(teacher){
-            if(confirm(`Вы точно хотите удалить ${teacher.name}?`)){
+            if(confirm(`Вы точно хотите удалить ${teacher.user.name}?`)){
                 axios.delete(`/teachers/delete/${teacher.id}`)
                     .then()
                     .catch(error => {console.log(error);});
@@ -68,15 +90,19 @@ export default {
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8" >
                 <div class="container-fluid">
                     <div class="col-auto">
-                        <div class="btn btn-outline-success hover:bg-green-500 rounded-5 float-start">
-                            <button @click="showModal = true">Добавить учителя</button>
-                        </div>
-                        <div class="float-end w-2/5">
+                        <div class="float-start w-2/5 mx-6">
                             <input class="w-full rounded-pill" type="search"  placeholder="Поиск по Ф.И.О. и e-mail" v-model="searchQuery">
                         </div>
+                        <div class="btn btn-outline-success hover:bg-green-500 rounded-5 mx-6 float-end">
+                            <button @click="showModal = true">Добавить учителя</button>
+                        </div>
+                        <div class="btn btn-outline-success hover:bg-green-500 rounded-5 mx-6 float-end">
+                            <button @click="exportToExcel">Экспортировать в Excel</button>
+                        </div>
+
                     </div>
                     <div class="mt-10 rounded-5 ">
-                        <table class="table mx-auto scroll-m-0.5 overscroll-y-auto table-striped table-bordered mt-4 table-hover bg-gray-300 text-black">
+                        <table id="table" class="table mx-auto scroll-m-0.5 overscroll-y-auto table-striped table-bordered mt-4 table-hover bg-gray-300 text-black">
                             <thead>
                             <tr>
                                 <th class="text-center">Ф.И.О.</th>

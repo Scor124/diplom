@@ -43,7 +43,6 @@ export default{
                     <label for="email" class="form-label">Email адрес</label>
                     <input type="email" v-model="email" class="form-control" id="email" required>
                 </div>
-
                 <div class="mb-3">
                     <label for="qualification" class="form-label">Специализация</label>
                     <input type="text" v-model="qualification" class="form-control" id="qualification" required>

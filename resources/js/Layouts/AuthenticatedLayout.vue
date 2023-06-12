@@ -13,8 +13,8 @@ const user = usePage().props.auth.user;
 
 <template>
     <div>
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-            <nav class="bg-dark dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+        <div class="min-h-screen bg-gray-600 dark:bg-gray-900">
+            <nav class="bg-gray-600 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
                 <!-- Primary Navigation Menu -->
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between h-16">
@@ -38,9 +38,6 @@ const user = usePage().props.auth.user;
                                 </NavLink>
                                 <NavLink :href="route('admin.classes')" :active="route().current('admin.classes')" v-if="user.id === 1017">
                                     Группы
-                                </NavLink>
-                                <NavLink :href="route('admin.students')" :active="route().current('admin.students')" v-if="user.id === 1017">
-                                    Студенты
                                 </NavLink>
                                 <NavLink :href="route('admin.teachers')" :active="route().current('admin.teachers')" v-if="user.id === 1017">
                                     Преподаватели
@@ -163,7 +160,7 @@ const user = usePage().props.auth.user;
             </header>
 
             <!-- Page Content -->
-            <main class="dark:bg-dots-lighter">
+            <main class="dark:bg-dots-lighter ">
                 <slot />
             </main>
         </div>

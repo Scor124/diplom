@@ -297,13 +297,10 @@ class APIDataController extends Controller
         return response()->json(Marks::where('case_id', '=', $subjectID)->get());
     }
     public function markAddOrUpdate(Request $request){
-        $month = $request->input('month');
-        $day = $request->input('day');
-        $year = $request->input('year');
-        $date = mktime(0,0,0,$month, $day, $year);
+        $date = $request->input('date');
         $mark = Marks::where('case_id', $request->input('case_id'))
             ->where('student_id', $request->input('student_id'))
-            ->where('date', date('Y-m-d', $date))->first();
+            ->where('date', $date)->first();
         echo $mark;
         if ($mark){
             $mark->mark = $request->input('mark');
@@ -313,7 +310,7 @@ class APIDataController extends Controller
         $mark = new Marks;
         $mark->case_id = $request->input('case_id');
         $mark->student_id = $request->input('student_id');
-        $mark->date = date('Y-m-d', $date);
+        $mark->date = $date;
         $mark->mark = $request->input('mark');
         $mark->save();
         return response()->json(['message'=>'Оценка поствлена']);
@@ -332,6 +329,45 @@ class APIDataController extends Controller
         return response()->json(
             $answer
         );
+    }
+    public function getMarkBySubjectDate(Request $request){
+        $subject_id = $request->input('subject_id');
+        $month = $request->input('month');
+        $year = $request->input('year');
+        $days_in_month = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        $answer = array();
+        $classID = Subjects::find($subject_id)->first()->classID;
+        $studCount = 0;
+        $Students = Student::where('class_id','=', $classID)->with('User')->get();
+        foreach ($Students as $stud){
+            $answer[$studCount][0] = [$stud['id'],$stud['user']['name']] ;
+            for ($i = 1; $i <= $days_in_month; $i++) {
+                $mark = Marks::where('case_id','=', $subject_id)
+                    ->where('student_id','=', $stud['id'])
+                    ->where('date', '=', date('Y-m-d', mktime(0,0,0,$month,$i,$year)))
+                    ->first();
+                if ($mark == null){
+                    $answer[$studCount][$i] = '-';
+                }else{
+                    $answer[$studCount][$i] = $mark['mark'];
+                }
+            }
+            $studCount++;
+        }
+
+        return response()->json([
+            'scores' => $answer
+        ]);
+    }
+    public function getMarksBySubjectAndDate(Request $request)
+    {
+        $subjectId = $request->input('subjectId');
+        $month = $request->input('month');
+        $year = $request->input('year');
+        return Marks::where('case_id', $subjectId)
+            ->whereMonth('date', $month)
+            ->whereYear('date', $year)
+            ->get();
     }
 }
 

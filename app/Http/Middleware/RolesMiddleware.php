@@ -10,13 +10,11 @@ class RolesMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        /*
-        if (!$request->user() && !$request->user()->is_teacher)
+        if (auth()->user() && auth()->user()->is_teacher)
         {
-            return route('welcome');
+            return $next($request);
 
         }
-        */
-        return $next($request);
+        return route('welcome');
     }
 }

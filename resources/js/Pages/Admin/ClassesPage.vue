@@ -26,9 +26,11 @@ export default{
         document.removeEventListener('keydown', this.handleTabKey);
     },
     methods: {
+        seeStudents(id){
+            window.location.href = `/admin/classes/${id}/students`;
+        },
         seeSubjects(id){
             axios.get(`/admin/classes/${id}/subjects`).then((response)=> console.log(response.data)).catch(error => console.log(error));
-            //route('class.subjects',{'groupId': id});
             window.location.href = `/admin/classes/${id}/subjects`;
         },
         updateGroupList(){
@@ -89,17 +91,20 @@ export default{
         </div>
         <div class="py-12 ">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 bg-transparent" >
-                <div class="container-fluid">
-                    <div class="col-auto">
-                        <div class="btn btn-outline-success hover:bg-green-500 rounded-5 float-start">
-                            <button @click="showModal = true">Добавить группу</button>
-                        </div>
-                        <div class="float-end w-2/5">
-                            <input class="w-full rounded-pill" type="search"  placeholder="Поиск по названию" v-model="searchQuery">
+                <div class="container">
+                    <div class="mb-5">
+                        <h6 class="w-full text-white mx-auto mb-2">Группы</h6>
+                        <div class="px-4">
+                            <div class="btn btn-outline-success hover:bg-green-500 rounded-5 float-end">
+                                <button @click="showModal = true">Добавить группу</button>
+                            </div>
+                            <div class="float-start w-3/5">
+                                <input class="w-full rounded-pill" type="search"  placeholder="Поиск по названию" v-model="searchQuery">
+                            </div>
                         </div>
                     </div>
                     <div class="mt-10 rounded-5">
-                        <table class="table mx-auto scroll-m-0.5 overscroll-y-auto table-striped table-hover bg-gray-300 text-black table-bordered mt-4">
+                        <table class="table mx-auto scroll-m-0.5 overscroll-y-auto table-striped table-hover bg-gray-300 text-black table-bordered">
                             <thead>
                             <tr>
                                 <th class="text-center">Название</th>
@@ -112,8 +117,9 @@ export default{
                                 <td class="px-3 align-middle">{{ group.name }}</td>
                                 <td class="px-3 align-middle">{{ group.formation_date }}</td>
                                 <td class="px-10 align-middle">
-                                    <button class="btn btn-outline-primary hover:text-blue-500 m-2" @click="seeSubjects(group.id)">Перейти к предметам</button>
-                                    <button class="btn btn-outline-danger hover:text-red-500  m-2" @click="deleteGroup(group)">Удалить</button>
+                                    <button class="btn btn-outline-primary hover:text-white m-2" @click="seeSubjects(group.id)">Перейти к предметам</button>
+                                    <button class="btn btn-outline-warning hover:text-white m-2" @click="seeStudents(group.id)">Студенты</button>
+                                    <button class="btn btn-outline-danger hover:text-white  m-2" @click="deleteGroup(group)">Удалить</button>
                                 </td>
                             </tr>
                             </tbody>

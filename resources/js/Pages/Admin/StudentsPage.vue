@@ -8,24 +8,26 @@ import axios from "axios";
 import StudentsAddPage from "@/Pages/Admin/StudentsAddPage.vue";
 import {data} from "autoprefixer";
 export default {
+    props:{
+        groupId: {
+            type: Number,
+        }
+    },
     components:{StudentsAddPage},
     data() {
         return {
             showModal: false,
-            groups: [],
-            selectedGroup: 0,
-            searchGroup: '',
+            selectedGroup: this.groupId,
             searchStudents: '',
             students: [],
         };
     },
     mounted() {
-        axios.get('/classes')
-            .then((response) => this.groups = response.data)
+        axios.get('/classes/' + this.selectedGroup + '/students')
+            .then((response) => this.students = response.data)
             .catch(error => {console.log(error.response.data.message)});
     },
     beforeDestroy() {
-        // Удаляем обработчик событий при уничтожении компонента
         document.removeEventListener('keydown', this.handleTabKey);
     },
     methods: {
@@ -40,14 +42,9 @@ export default {
             if (this.showModal && event.key === 'Tab') {
                 event.preventDefault();
             }
-        },      //
+        },
         updateStudents(student) {
             let UserID = student.id;
-            /*
-            axios.get(`/api/users/${UserID}`)
-                .then(response => UserID = response.data.id)
-                .catch(error => {console.log(error.response.data.message)});
-             */
             axios.put(`/users/update/${UserID}/`, {
                 name: student.name
             })
@@ -58,30 +55,13 @@ export default {
             if(confirm(`Вы точно хотите удалить ${student.name}?`)){
                 let UserID = student.UserID;
                 axios.delete(`/student/delete/${student.id}`)
-                    .then(this.groupChanged)
-                    .catch(error => {
+                    .then().catch(error => {
                         console.log(error);
                     });
-                /*
-                axios.delete(`/users/delete/${UserID}`)
-                    .then(this.groupChanged())
-                    .catch(error => {
-                        console.log(error);
-                    });
-                 */
-
             }
-        }        // Удалить пользователя (опционально)
+        }
     },
     computed: {
-        filtredGroups() {
-            if (!this.searchGroup) {
-                return this.groups
-            }
-            return this.groups.filter(group =>
-                group.name.toLowerCase().includes(this.searchGroup.toLowerCase())
-            )
-        },
         filteredStudents() {
             if (!this.searchStudents) {
                 return this.students
@@ -90,69 +70,50 @@ export default {
                 student.name.toLowerCase().includes(this.searchStudents.toLowerCase())
             )
         },
-        groupChanged(){
-            axios.get('/classes/' + this.selectedGroup + '/students')
-                .then((response) => this.students = response.data)
-                .catch(error => {console.log(error.response.data.message)});
-        },            // При изменение выбора группы
     },
 }
 </script>
 <template>
     <Head title="Управление студентами"></Head>
     <AuthenticatedLayout>
-        <div v-if="showModal && selectedGroup!==0" style="position: fixed;    z-index: 9999;    top: 0;    left: 0;    width: 100%;    height: 100%;    background-color: rgba(0, 0, 0, 0.5);">
+        <div v-if="showModal" style="position: fixed;    z-index: 9999;    top: 0;    left: 0;    width: 100%;    height: 100%;    background-color: rgba(0, 0, 0, 0.5);">
             <div class="bg-gray-600 rounded-5" style="position: absolute;    top: 50%;    left: 50%;    transform: translate(-50%, -50%);        border-radius: 5px;    padding: 20px;">
                 <div class="float-end">
-                    <button class="btn btn-close hover:bg-red-700" @click="showModal = false; groupChanged"></button>
+                    <button class="btn btn-close hover:bg-red-700" @click="showModal = false"></button>
                 </div>
-                <StudentsAddPage :groupId="selectedGroup" />
+                <StudentsAddPage :groupId="groupId" />
             </div>
         </div>
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8" >
                 <div>
-
-                    <div class="mt-10 rounded-5 row container-fluid">
-                            <div class="col-md-6 w-1/5 bg-gray-600 rounded-5 px-3">
-                                <div class="m-1">
-                                    <input class="w-full rounded-pill" type="search"  placeholder="Поиск по названию" v-model="searchGroup">
-                                </div>
-                                <div class="m-4" id="group-selection">
-                                    <label for="group-select">Выбрать группу:</label>
-                                    <select class="form-select rounded-5" v-model="selectedGroup" @change="groupChanged">
-                                        <option disabled value="0">Выберите группу</option>
-                                        <option v-for="group in filtredGroups" :key="group.id" :value="group.id">{{ group.name }}</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6 w-auto bg-gray-600 text-black">
-                                <div class="col-auto m-3">
-                                    <h4 class="text-center font-semibold">Студенты</h4>
-                                    <div class="float-end w-2/5">
-                                        <input class="w-full rounded-pill" type="search"  placeholder="Поиск по Ф.И.О." v-model="searchStudents">
+                    <div class="mt-10 rounded-5 container-fluid">
+                            <div class="w-auto bg-gray-600 text-black rounded-5 border-1 p-2">
+                                <div class="col m-3">
+                                    <h6 class="text-center font-semibold font">Студенты</h6>
+                                    <div>
+                                        <div class="float-start w-3/5">
+                                            <input class="w-full rounded-pill" type="search"  placeholder="Поиск по Ф.И.О." v-model="searchStudents">
+                                        </div>
+                                        <div class="btn btn-outline-success hover:bg-green-500 rounded-5 float-end">
+                                            <button @click="showModal = true" >Добавить студента</button>
+                                        </div>
                                     </div>
                                 </div>
-
-                                <table class="table table-striped">
+                                <table class="table table-striped w-full">
                                     <thead>
                                         <tr>
-                                            <th>Ф.И.О. студентов</th>
-                                            <th>E-mail</th>
-                                            <th class="text-center">Действия</th>
-                                            <th>
-                                                <div v-if="selectedGroup!==0" class="btn btn-outline-success hover:bg-green-500 rounded-5 float-start">
-                                                    <button @click="showModal = true" >Добавить студента</button>
-                                                </div>
-                                            </th>
+                                            <th class="text-center w-3/7">Ф.И.О. студентов</th>
+                                            <th class="text-center w-2/7">E-mail</th>
+                                            <th class="text-center w-2/7">Действия</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr v-for="student in filteredStudents" :key="student.id">
-                                            <td><input v-model="student.name" type="text" @change="updateStudents(student)"></td>
-                                            <td>{{ student.email }}</td>
+                                            <td ><input class="class=my-auto w-full" v-model="student.name" type="text" @change="updateStudents(student)"></td>
+                                            <td class="my-auto mx-auto">{{ student.email }}</td>
                                             <td>
-                                                <button class="btn btn-outline-info hover:text-white-500 border-blue-700 m-2" @click="passwordReset(student)">Сбросить пароль</button>
+                                                <button class="btn btn-outline-info hover:text-white-500 border-blue-700" @click="passwordReset(student)">Сбросить пароль</button>
                                                 <button class="btn btn-outline-danger hover:text-red-500 border-red-700 m-2" @click="deleteUser(student)" disabled>Удалить</button>
                                             </td>
                                         </tr>

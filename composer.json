@@ -15,7 +15,8 @@
         "laravel/tinker": "^2.8",
         "laravel/ui": "^4.2",
         "tightenco/ziggy": "^1.0",
-        "twbs/bootstrap": "5.3.0-alpha3"
+        "twbs/bootstrap": "5.3.0-alpha3",
+        "ext-calendar": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

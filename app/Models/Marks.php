@@ -26,7 +26,6 @@ class Marks extends Model
     {
         return $this->belongsTo(Student::class,'student_id','id');
     }
-
     public function subject()
     {
         return $this->belongsTo(Subjects::class,'case_id','id');
