@@ -9,9 +9,7 @@ import StudentsAddPage from "@/Pages/Admin/StudentsAddPage.vue";
 import {data} from "autoprefixer";
 export default {
     props:{
-        groupId: {
-            type: Number,
-        }
+        groupId: {type: Number,}
     },
     components:{StudentsAddPage},
     data() {

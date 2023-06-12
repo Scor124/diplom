@@ -9,7 +9,6 @@ use Laravel\Sanctum\HasApiTokens;
 class Marks extends Model
 {
     use HasApiTokens, Notifiable;
-
     protected $table = 'marks';
     protected $primaryKey = 'id';
     public $timestamps = false;

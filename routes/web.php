@@ -105,12 +105,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/classes/{id}', [APIDataController::class, 'getClass']);
             Route::post('/classes/create', [APIDataController::class,'createClass']);
             Route::delete('/classes/delete/{id}', [APIDataController::class, 'deleteClass']);
-
-
-
             Route::get('/subject/marks', [APIDataController::class, 'getMarksFromCurrentSubject']);
-
-
+            Route::post('/subject/create',[APIDataController::class, 'storeSubject']);
             Route::get('/markses', [APIDataController::class,'getMark']);
             Route::get('/lpi/marks', [APIDataController::class, 'getMarksBySubjectAndDate']);
         });

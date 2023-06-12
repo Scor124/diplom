@@ -28,11 +28,11 @@ export default{
             axios.post('/subject/create', {
                 name: this.name,
                 classID: this.groupId,
-                teacherID: this.selectedTeacher,
+                teacherID: this.selectedTeacher.id,
             })
                 .then(function (response) {
                     console.log(response);
-                    alert('Студент создан!');
+                    alert('Предмет создан!');
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -64,8 +64,8 @@ export default{
                 <!-- Поле email -->
 
                 <div class="mb-3">
-                    <input type="text" v-model="searchQuery" @input="filteredTeachers" class="form-control" placeholder="Search teacher...">
-                    <select class="form-select mt-2" v-model="selectedTeacher">
+                    <input type="text" v-model="searchQuery" @input="filteredTeachers" class="form-control" placeholder="Поиск учителя по ФИО...">
+                    <select class="form-select mt-2" v-model="selectedTeacher" required>
                         <option v-for="teacher in filteredTeachers" :key="teacher.id" :value="teacher" selected>{{ teacher.user.name }}</option>
                     </select>
                 </div>

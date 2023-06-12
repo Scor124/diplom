@@ -86,7 +86,6 @@ export default {
     },
 }
 </script>
-
 <template>
     <Head title="Управление пользователями"></Head>
     <AuthenticatedLayout>

@@ -28,21 +28,18 @@ export default {
     methods: {
         exportToExcel(){
             //table
-            const table = document.getElementById('table');
-            const rows = Array.from(table.querySelectorAll('tr'));
-            const headers = Array.from(rows.shift().querySelectorAll('th')).map(header => header.innerText);
-            const data = rows.map(row => {
-                const rowData = {};
-                Array.from(row.querySelectorAll('td')).forEach((cell, index) => {
-                    rowData[headers[index]] = cell.innerText;
-                });
-                return rowData;
-            });
-            const workbook = XLSX.utils.book_new();
-            const worksheet = XLSX.utils.json_to_sheet(data);
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
-            XLSX.writeFile(workbook, 'data.xlsx');
-
+            let wb = XLSX.utils.book_new();
+            // формируем массив данных для листа
+            let ws_data = [];
+            ws_data.push(['Ф.И.О.', 'E-mail', 'Специализация']);
+            this.teachers.forEach(row => ws_data.push([row.user.name, row.user.email, row.Qualification]));
+            // преобразуем данные в формат, понятный XLSX
+            let worksheet = XLSX.utils.aoa_to_sheet(ws_data);
+            //let worksheet = XLSX.utils.json_to_sheet(ws_data);
+            // добавляем лист с данными в рабочую книгу
+            XLSX.utils.book_append_sheet(wb, worksheet, `Оценки_${new Date().toDateString()}`);
+            // сохраняем файл
+            XLSX.writeFile(wb, `Преподаватели_${new Date().toDateString()}.xlsx`);
         },
         handleTabKey(event) {
             if (this.showModal && event.key === 'Tab') {

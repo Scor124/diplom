@@ -269,11 +269,9 @@ class APIDataController extends Controller
     public function getClass($id)
     {
         $class = Classes::find($id);
-
         if (!$class) {
             return response()->json(['message' => 'Class not found'], 404);
         }
-
         return response()->json($class);
     }
     public function getStudentsByGroupId($groupId) {
@@ -315,21 +313,6 @@ class APIDataController extends Controller
         $mark->save();
         return response()->json(['message'=>'Оценка поствлена']);
     }
-    public function getMark(Request $request){
-        $studentID = $request->input('student_id');
-        $caseID = $request->input('case_id');
-        $date = $request->input('date');
-        $answer = Marks::where('case_id','=',$caseID)
-            ->where('student_id', '=', $studentID)
-            ->where('date', '=', $date)
-            ->first('mark');
-        if ($answer==null){
-            return response()->json(['mark'=> '-']);
-        }
-        return response()->json(
-            $answer
-        );
-    }
     public function getMarkBySubjectDate(Request $request){
         $subject_id = $request->input('subject_id');
         $month = $request->input('month');
@@ -354,7 +337,6 @@ class APIDataController extends Controller
             }
             $studCount++;
         }
-
         return response()->json([
             'scores' => $answer
         ]);
@@ -368,6 +350,24 @@ class APIDataController extends Controller
             ->whereMonth('date', $month)
             ->whereYear('date', $year)
             ->get();
+    }
+    public function storeSubject(Request $request){
+        $name = $request->input('name');
+        $teacherID = $request->input('teacherID');
+        $groupID = $request->input('classID');
+        $subject = Subjects::where('name', '=', $name)
+            ->where('teacherID', '=', $teacherID)
+            ->where('classID','=', $teacherID)->first();
+        if ($subject != null){
+            return response()->json(['message'=>'Предмет уже существует!'], 409);
+        }
+        $subject = new Subjects;
+        $subject->teacherID = $teacherID;
+        $subject->classID = $groupID;
+        $subject->name = $name;
+        $subject->save();
+
+        return response()->json(['message'=> 'Успешно создано']);
     }
 }
 
