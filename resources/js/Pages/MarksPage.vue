@@ -112,7 +112,6 @@ export default {
             });
             // преобразуем данные в формат, понятный XLSX
             let worksheet = XLSX.utils.aoa_to_sheet(ws_data);
-            //let worksheet = XLSX.utils.json_to_sheet(ws_data);
             // добавляем лист с данными в рабочую книгу
             XLSX.utils.book_append_sheet(wb, worksheet, `Оценки_${new Date().toDateString()}`);
             // сохраняем файл
@@ -168,7 +167,7 @@ export default {
                     <div class="p-3 container">
                         <div class="row-auto container h-auto">
                             <!-- Для классов столбец -->
-                            <div class="p-3 rounded-1 border-white border-2 w-1/5 float-start">
+                            <div class="p-3 rounded-2 border-white border-2 w-1/5 float-start m-2">
                                 <h5 class="text-center w-full text-white mb-2">Список классов</h5>
                                 <input type="search" v-model="searchClass" class="h-7 w-full px-2 mb-4" placeholder="Введите название класса">
                                 <select class="form-select rounded-5" v-model="selectedClass" @change="showSubjects">
@@ -176,9 +175,9 @@ export default {
                                 </select>
                             </div>
                             <!-- Для предметов столбец -->
-                            <div class="p-3 rounded-1 border-white border-2 w-1/5 float-start" v-if="selectedClass!==0">
+                            <div class="p-3 rounded-2 border-white border-2 w-1/5 float-start m-2" v-if="selectedClass!==0">
                                 <h5 class="text-center w-full text-white mb-2">Список предметов</h5>
-                                <input type="search" v-model="searchSubject" class="h-7 w-full px-2 mb-3" placeholder="Введите название предмета">
+                                <input type="search" v-model="searchSubject" class="h-7 w-full px-2 mb-4" placeholder="Введите название предмета">
                                 <select class="form-select rounded-5" v-model="selectedSubject" @change="updateTable">
                                     <option v-for="subject in filtredSubjects" :key="subject.id" :value="subject.id" >
                                         {{ subject.name }}
@@ -189,27 +188,31 @@ export default {
                         <div class="row container">
                             <!-- Для оценок столбец -->
                             <div class="p-3 rounded-1 border-white border-2 w-max" v-if="selectedClass!==0 && selectedSubject!==0">
-                                <h5 class="text-center w-full text-white mb-2">Оценки</h5>
+                                <h5 class="text-center w-full text-white mb-3">Оценки</h5>
                                 <div class="h-10 w-full px-2 mb-2 d-flex justify-content-between">
-                                    <h1 class="text-white mx-auto px-4">Выберите месяц</h1>
-                                    <select class="form-select rounded-5 mx-auto px-4" v-model="selectedMonth" @change="updateTable">
-                                        <option v-for="month in months" :value="month.id" >{{ month.name }}</option>
-                                    </select>
-                                    <h1 class="text-white mx-auto px-4">Выберите год</h1>
-                                    <select class="form-select rounded-5 px-4 mx-auto" v-model="selectedYear" @change="updateTable">
-                                        <option v-for="year in ['2019','2020','2021','2022','2023']" :value="year" >{{ year }}</option>
-                                    </select>
-                                    <button class="btn btn-outline-danger mx-auto px-4" @click="resetDates">Сбросить</button>
-                                    <div class="btn btn-outline-success hover:bg-green-500 px-4 rounded-5 mx-auto float-end">
-                                        <button @click="exportToExcel">Экспортировать в Excel</button>
+                                    <div class="mx-auto w-3/10 row">
+                                        <h1 class="text-white col my-auto">Выберите месяц</h1>
+                                        <select class="form-select bg-gray-400 col" v-model="selectedMonth" @change="updateTable">
+                                            <option v-for="month in months" :value="month.id" >{{ month.name }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="mx-auto w-3/10 row">
+                                        <h1 class="text-white col my-auto">Выберите год</h1>
+                                        <select class="form-select bg-gray-400 col" v-model="selectedYear" @change="updateTable">
+                                            <option v-for="year in ['2019','2020','2021','2022','2023']" :value="year" >{{ year }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="mx-auto w-4/10 row">
+                                        <button class="btn btn-outline-danger col my-auto" @click="resetDates">Сбросить</button>
+                                        <button class="btn btn-outline-success hover:bg-green-500 col my-auto text-nowrap" @click="exportToExcel">Экспортировать в Excel</button>
                                     </div>
                                 </div>
                                 <div class="scrollable-x table-responsive">
                                     <table class="table table-striped-columns text-white table-hover" id="table">
                                         <thead>
                                         <tr>
-                                            <th>Студент</th>
-                                            <th v-for="(day, index) in daysInMonth" :key="index">{{ day }}</th>
+                                            <th class="table-fixed">Студент</th>
+                                            <th v-for="(day, index) in daysInMonth" :key="index" class="text-center">{{ day }}</th>
                                             <th>Средний балл</th>
                                             <th>Кол-во пропусков</th>
                                         </tr>
@@ -218,7 +221,8 @@ export default {
                                         <tr v-for="row in marks" class="hover:bg-gray-400 hover:border-white">
                                             <td class="text-white">{{ row[0][1] }}</td>
                                             <td v-for="(day, index) in daysInMonth" :key="index" class="text-black">
-                                                <select v-model="row[index+1]" v-on:change="saveMark($event, day, row[0][0])" class="text-black select-transparent">
+                                                <select v-model="row[index+1]" v-on:change="saveMark($event, day, row[0][0])"
+                                                        class="text-black select-transparent">
                                                     <option v-for="ans in possibleMarks">{{ans}}</option>
                                                 </select>
                                             </td>

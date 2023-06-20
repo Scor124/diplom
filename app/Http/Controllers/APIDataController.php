@@ -341,12 +341,14 @@ class APIDataController extends Controller
             'scores' => $answer
         ]);
     }
-    public function getMarksBySubjectAndDate(Request $request)
+    public function getMarksBySubjectDateAndStudent(Request $request)
     {
+        $studentID = $request->input('studentID');
         $subjectId = $request->input('subjectId');
         $month = $request->input('month');
         $year = $request->input('year');
         return Marks::where('case_id', $subjectId)
+            ->where('student_id','=', $studentID)
             ->whereMonth('date', $month)
             ->whereYear('date', $year)
             ->get();

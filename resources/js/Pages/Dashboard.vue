@@ -40,12 +40,13 @@ defineProps({
                                             Преподаватели
                                         </Link>
                                     </div>
-                                    <div v-if="isTeacher = false" class="container-fluid flex justify-center font-semibold">
-                                        <div >
-                                            <Link :href="route('mymarks')" :ref="route('mymarks')">
-                                                Посмортеть оценки
-                                            </Link>
-                                        </div>
+                                    <div class="container-fluid m-5 p-3 d-flex justify-content-start font-semibold">
+                                        <Link class="btn btn-outline-primary mx-2 hover:text-blue-400 text-gray-200" :href="route('mymarks')" :ref="route('mymarks')" v-if="isTeacher===false">
+                                            Посмортеть оценки
+                                        </Link>
+                                        <Link class="btn btn-outline-primary mx-2 hover:text-blue-400 text-gray-200" :href="route('marks')" :ref="route('marks')" v-else>
+                                            Выставить оценки
+                                        </Link>
                                     </div>
                                 </div>
                             </div>

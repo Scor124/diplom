@@ -2,6 +2,7 @@
 import axios from "axios";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import TeacherAddPage from "@/Pages/Admin/TeacherAddPage.vue";
+import {Head, Link} from "@inertiajs/vue3";
 </script>
 
 <script>
