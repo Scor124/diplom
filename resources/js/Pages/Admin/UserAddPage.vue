@@ -13,6 +13,10 @@ export default{
     },
     methods: {
         addUser: function () {
+            if (!/[А-Яа-я]+$/.test(this.name)) {
+                alert('Введите русские буквы')
+                return
+            }
             axios.post('/users/create', {
                 name: this.name,
                 email: this.email,
@@ -63,23 +67,3 @@ export default{
         </div>
     </div>
 </template>
-<!--
-    <h1>Добавление пользователя</h1>
-            <form class="container-fluid">
-                <fieldset class="row-auto rounded-pill">
-                    <label>Ф.И.О.:</label>
-                    <input class="form-control" type="text" v-model="name">
-                </fieldset>
-                <fieldset class="row-auto rounded-pill">
-                    <label>Почта:</label>
-                    <input class="form-control" type="email" v-model="email">
-                </fieldset>
-                <fieldset class="row-auto rounded-pill">
-                    <label>Пароль:</label>
-                    <input class="form-control" type="password" v-model="password">
-                </fieldset>
-                <fieldset class="flex h-4 justify-content-end mt-4">
-                    <button class="btn btn-primary" type="submit" v-on:click.prevent="addUser()">Добавить</button>
-                </fieldset>
-            </form>
--->

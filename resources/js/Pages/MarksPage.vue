@@ -81,7 +81,6 @@ export default {
         },
         averageMarks(row) {
             // Обработать вход массива
-            console.log(row.date);
             const numbers = row.slice(1).filter(c => !isNaN(c) && c >= 2 && c <= 5).map(Number);
             const sum = numbers.reduce((acc, val) => acc + val, 0);
             return (sum / numbers.length).toFixed(2);

@@ -38,7 +38,7 @@ Route::middleware('auth')->group(function () {
         ]);
     })->name('mymarks');
     Route::get('/classes/{id}/subjects', [APIDataController::class, 'getSubjectsOfGroup']);
-
+    Route::post('/marks/byStudentAndDate', [APIDataController::class, 'getMarksBySubjectDateAndStudent']);
     Route::middleware(['is_teacher'])->group(function (){
         // Cтраницы для учителей
         Route::get('/marks',function (){

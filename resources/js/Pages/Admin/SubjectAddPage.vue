@@ -25,6 +25,10 @@ export default{
     methods: {
 
         addSubject() {
+            if (!/[А-Яа-я]+$/.test(this.name)) {
+                alert('Введите русские буквы')
+                return
+            }
             axios.post('/subject/create', {
                 name: this.name,
                 classID: this.groupId,
@@ -59,7 +63,7 @@ export default{
                 <!-- Поле имя -->
                 <div class="mb-3">
                     <label for="name" class="form-label">Название предмета</label>
-                    <input type="text" v-model="name" class="form-control" id="name" required>
+                    <input type="text" v-model="name" pattern="[А-Яа-я]+" class="form-control" id="name" required>
                 </div>
                 <!-- Поле email -->
 

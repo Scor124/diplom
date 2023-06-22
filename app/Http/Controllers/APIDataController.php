@@ -344,14 +344,24 @@ class APIDataController extends Controller
     public function getMarksBySubjectDateAndStudent(Request $request)
     {
         $studentID = $request->input('studentID');
-        $subjectId = $request->input('subjectId');
+        $subject_id = $request->input('subject_id');
         $month = $request->input('month');
         $year = $request->input('year');
-        return Marks::where('case_id', $subjectId)
-            ->where('student_id','=', $studentID)
-            ->whereMonth('date', $month)
-            ->whereYear('date', $year)
-            ->get();
+        $days_in_month = cal_days_in_month(CAL_GREGORIAN, $month-1, $year);
+        $answer = array();
+        $answer[0] = $studentID;
+        for ($i = 1; $i <= $days_in_month; $i++) {
+            $mark = Marks::where('case_id','=', $subject_id)
+                ->where('student_id','=', $studentID)
+                ->where('date', '=', date('Y-m-d', mktime(0,0,0,$month,$i,$year)))
+                ->first();
+            if ($mark == null){
+                $answer[$i] = '-';
+            }else{
+                $answer[$i] = $mark['mark'];
+            }
+        }
+        return response()->json($answer);
     }
     public function storeSubject(Request $request){
         $name = $request->input('name');

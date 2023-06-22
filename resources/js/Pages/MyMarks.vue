@@ -36,7 +36,6 @@ export default {
         };
     },
     mounted() {
-
         axios.get(`/classes/${this.user.class_id}/subjects`)
             .then(response => {
                 this.subjects = response.data;
@@ -44,22 +43,48 @@ export default {
             .catch(error => console.log(error.message))
     },
     computed:{
+        daysInMonth() {
+            const year = this.selectedYear;
+            const month = this.selectedMonth;
+            const days = new Date(year, month-1, 0).getDate();
+            return Array.from({ length: days }, (v, k) => k + 1);
+        },
         filtredSubjects(){
             if (this.searchSubject === ''){
                 return this.subjects
             }
             return this.subjects.filter(subject => subject.name.toLowerCase().includes(this.searchSubject.toLowerCase()))
         },
-        averageMark(){
-            return 0;
-        },
+
     },
     methods:{
+        totalPass(row) {
+            let totalPasses = 0;
+            row.slice(1).forEach(char => {
+                if (char === 'Б' || char === 'Н') {
+                    totalPasses++;
+                }
+            });
+            return totalPasses;
+        },
+        averageMark(row){
+            const numbers = row.slice(1).filter(c => !isNaN(c) && c >= 2 && c <= 5).map(Number);
+            const sum = numbers.reduce((acc, val) => acc + val, 0);
+            return (sum / numbers.length).toFixed(2);
+        },
         getMarkForSubject(){
-            axios.get('').then().catch()
+            this.updateTable()
         },
         updateTable(){
-
+            this.marks = [];
+            axios.post('/marks/byStudentAndDate',{
+                    'studentID': this.user.id,
+                    'subject_id': this.selectedSubject,
+                    'month': this.selectedMonth,
+                    'year': this.selectedYear,
+            }).then(r => {
+                this.marks = r.data
+            }).catch(e => e.message)
         },
     },
 };
@@ -73,13 +98,13 @@ export default {
                         <div class="w-full" >
                             <input class="w-full m-2" type="search" placeholder="Поиск предмета" v-model="searchSubject">
                             <select class="form-select w-full m-2" v-model="selectedSubject" @change="getMarkForSubject">
-                                <option v-for="subj in filtredSubjects" :key="subj.id">
+                                <option v-for="subj in filtredSubjects" :key="subj.id" :value="subj.id">
                                     {{ subj.name }}
                                 </option>
                             </select>
                         </div>
                     </div>
-                    <div class="col px-4 w-auto" >
+                    <div class="col px-4 w-auto" v-if="selectedSubject!==null">
                         <div class="row">
                             <div class="col-6 p-2">
                                 <table class="table text-white bg-transparent p-1">
@@ -90,8 +115,9 @@ export default {
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr class="row">
-                                        <th class="col"></th>
+                                    <tr v-for="(day, index) in daysInMonth" :key="index" class="bg-transparent text-white">
+                                        <th >{{ day }}</th>
+                                        <th >{{ marks[index+1] }}</th>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -112,12 +138,8 @@ export default {
                                             </select>
                                         </div>
                                     </div>
-                                    <select  >
-                                        <option disabled selected>Выберите четверть</option>
-                                        <option></option>
-                                    </select>
-                                    <p class="mt-3 text-white">Всего пропусков: </p>
-                                    <p class="mt-3 text-white">Средняя оценка: </p>
+                                    <p class="mt-3 text-white">Всего пропусков: {{ totalPass(marks) }}</p>
+                                    <p class="mt-3 text-white">Средняя оценка: {{ averageMark(marks) }}</p>
 
                                 </div>
                             </div>

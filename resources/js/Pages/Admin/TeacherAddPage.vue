@@ -13,6 +13,10 @@ export default{
     },
     methods: {
         addTeacher() {
+            if (!/[А-Яа-я]+$/.test(this.name)) {
+                alert('Введите русские буквы')
+                return
+            }
             axios.post('/teachers/create', {
                 name: this.name,
                 email: this.email,
@@ -41,11 +45,11 @@ export default{
                 <!-- Поле email -->
                 <div class="mb-3">
                     <label for="email" class="form-label">Email адрес</label>
-                    <input type="email" v-model="email" class="form-control" id="email" required>
+                    <input type="email" v-model="email" pattern="[А-Яа-я]+" class="form-control" id="email" required>
                 </div>
                 <div class="mb-3">
                     <label for="qualification" class="form-label">Специализация</label>
-                    <input type="text" v-model="qualification" class="form-control" id="qualification" required>
+                    <input type="text" v-model="qualification" pattern="[А-Яа-я]+" class="form-control" id="qualification" required>
                 </div>
                 <!-- Поле пароль -->
                 <div class="mb-3 rounded-pill">
