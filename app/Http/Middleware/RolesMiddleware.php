@@ -13,7 +13,6 @@ class RolesMiddleware
         if (auth()->user() && auth()->user()->is_teacher)
         {
             return $next($request);
-
         }
         return route('welcome');
     }

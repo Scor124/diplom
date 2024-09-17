@@ -48,7 +48,7 @@ export default{
                 <!-- Поле имя -->
                 <div class="mb-3">
                     <label for="name" class="form-label">Ф.И.О.</label>
-                    <input type="text" v-model="name" pattern="[А-Яа-я]+"  class="form-control" id="name" required>
+                    <input type="text" v-model="name" pattern="^[А-Яа-яЁё\s]+$"  class="form-control" id="name" required>
                 </div>
                 <!-- Поле email -->
                 <div class="mb-3">

@@ -6,6 +6,7 @@ import {Head,Link} from "@inertiajs/vue3";
 <script>
 import axios from "axios";
 import * as XLSX from "xlsx";
+
 const months = [
     { id: 1, name: 'Январь' },
     { id: 2, name: 'Февраль' },
@@ -28,7 +29,6 @@ export default {
             subjects: [],
             students: [],
             marks: {},
-            selectedMark:{},
 
             searchClass: '',
             searchSubject: '',
@@ -83,6 +83,7 @@ export default {
             // Обработать вход массива
             const numbers = row.slice(1).filter(c => !isNaN(c) && c >= 2 && c <= 5).map(Number);
             const sum = numbers.reduce((acc, val) => acc + val, 0);
+            if (sum === 0) return 'неуд';
             return (sum / numbers.length).toFixed(2);
         },
         exportToExcel() {
@@ -117,14 +118,16 @@ export default {
             XLSX.writeFile(wb, `Оценки_${months[this.selectedMonth].name}_${new Date().toDateString()}.xlsx`);
         },
         updateTable(){
+            console.log(this.selectedSubject)
             this.marks = {};
-            this.students = [];
             axios.post('/marksBySubject',{
+                'classID': this.selectedClass,
                 'subject_id': this.selectedSubject,
                 'month': this.selectedMonth,
                 'year': this.selectedYear,
             }).then(r => {
                 this.marks = r.data.scores;
+                console.log(this.marks)
             }).catch(e=>console.log(e.message))
         },
         saveMark(event,day, studentID){
@@ -136,13 +139,15 @@ export default {
             }).then(r=>console.log(r)).catch(err=>console.log(err.message));
         },
         showSubjects(){
+            console.log(this.selectedClass)
             this.selectedSubject = 0;
             axios.get(`/classes/${this.selectedClass}/students`).then(response =>{
                 this.students = response.data
-            }).catch()
+                console.log(this.students)
+            }).catch(e => console.log(e.message))
             axios.get(`/classes/${this.selectedClass}/subjects`).then(response =>{
                 this.subjects = response.data
-            }).catch()
+            }).catch(e => console.log(e.message))
         },
         getDateInYMD(day){
             let $ast = new Date(this.selectedYear, this.selectedMonth - 1, day+1).toISOString().slice(0, 10);

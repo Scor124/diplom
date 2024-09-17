@@ -315,11 +315,11 @@ class APIDataController extends Controller
     }
     public function getMarkBySubjectDate(Request $request){
         $subject_id = $request->input('subject_id');
+        $classID = $request->input('classID');
         $month = $request->input('month');
         $year = $request->input('year');
         $days_in_month = cal_days_in_month(CAL_GREGORIAN, $month, $year);
         $answer = array();
-        $classID = Subjects::find($subject_id)->first()->classID;
         $studCount = 0;
         $Students = Student::where('class_id','=', $classID)->with('User')->get();
         foreach ($Students as $stud){

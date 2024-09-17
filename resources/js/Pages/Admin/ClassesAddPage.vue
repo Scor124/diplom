@@ -11,10 +11,6 @@ export default{
     },
     methods: {
         addUser: function () {
-            if (!/[А-Яа-я]+$/.test(this.name)) {
-                alert('Введите русские буквы')
-                return
-            }
             let group = {
                 name: this.name,
                 formation_date: this.formation_date
@@ -38,7 +34,7 @@ export default{
                 <form class="container-fluid">
                     <fieldset class="col-auto">
                         <label>Название группы:</label>
-                        <input class="form-control" type="text" pattern="[А-Яа-я]+" v-model="name">
+                        <input class="form-control" type="text" pattern="^[А-Яа-я0-9\s]+$" v-model="name">
                     </fieldset>
                     <fieldset class="col-auto">
                         <label>Дата создания:</label>

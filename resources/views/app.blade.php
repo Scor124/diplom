@@ -18,7 +18,26 @@
 
         @inertiaHead
     </head>
-    <body class="font-sans antialiased justify-content-center bg-gray-100">
+    <body class="font-sans antialiased justify-content-center bg-color-#424242">
+            <div class="container-fluid bg-gray-800">
+                <div class="row">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-6">
+                        <ul class="nav justify-content-center">
+                            <li class="nav-item">
+                                <a class="nav-link" href="https://og-ti.ru/sveden"> Сведения об образовательной организации</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="https://og-ti.ru/institut/novosti"> Новости</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="https://og-ti.ru/biblioteka/elektronnyj-katalog">Электронный каталог</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3"></div>
+                </div>
+        </div>
         @inertia
     </body>
 </html>

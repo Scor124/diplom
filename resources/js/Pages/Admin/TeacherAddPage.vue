@@ -40,16 +40,16 @@ export default{
                 <!-- Поле имя -->
                 <div class="mb-3">
                     <label for="name" class="form-label">Ф.И.О.</label>
-                    <input type="text" v-model="name" class="form-control" id="name" required>
+                    <input type="text" v-model="name" pattern="^[А-Яа-яЁё\s]+$" class="form-control" id="name" required>
                 </div>
                 <!-- Поле email -->
                 <div class="mb-3">
                     <label for="email" class="form-label">Email адрес</label>
-                    <input type="email" v-model="email" pattern="[А-Яа-я]+" class="form-control" id="email" required>
+                    <input type="email" v-model="email"  class="form-control" id="email" required>
                 </div>
                 <div class="mb-3">
                     <label for="qualification" class="form-label">Специализация</label>
-                    <input type="text" v-model="qualification" pattern="[А-Яа-я]+" class="form-control" id="qualification" required>
+                    <input type="text" v-model="qualification" pattern="^[A-Za-zА-Яа-яЁё\s]+$" class="form-control" id="qualification" required>
                 </div>
                 <!-- Поле пароль -->
                 <div class="mb-3 rounded-pill">
